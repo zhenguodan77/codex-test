@@ -14,6 +14,32 @@ import ChatPage from './pages/ChatPage'
 
 type Tab = 'home' | 'timeline' | 'chat'
 
+const ICONS: Record<Tab, JSX.Element> = {
+  home: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  ),
+  timeline: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  ),
+  chat: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-2.9-.4-4.1-1L3 20l1-5.4a8.5 8.5 0 1 1 17-3.1Z" />
+    </svg>
+  ),
+}
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: 'home', label: '记录' },
+  { key: 'timeline', label: '时光' },
+  { key: 'chat', label: '絮语' },
+]
+
 export default function App() {
   const [tab, setTab] = useState<Tab>('home')
   const [entries, setEntries] = useState<Entry[]>(() => loadEntries())
@@ -37,15 +63,17 @@ export default function App() {
       </main>
 
       <nav className="tabbar">
-        <button className={tab === 'home' ? 'active' : ''} onClick={() => setTab('home')}>
-          <span className="tab-icon">✎</span>记录
-        </button>
-        <button className={tab === 'timeline' ? 'active' : ''} onClick={() => setTab('timeline')}>
-          <span className="tab-icon">⧗</span>时光
-        </button>
-        <button className={tab === 'chat' ? 'active' : ''} onClick={() => setTab('chat')}>
-          <span className="tab-icon">✉</span>絮语
-        </button>
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            className={`tab ${tab === t.key ? 'active' : ''}`}
+            aria-label={t.label}
+            onClick={() => setTab(t.key)}
+          >
+            <span className="tab-icon">{ICONS[t.key]}</span>
+            <span className="tab-label">{t.label}</span>
+          </button>
+        ))}
       </nav>
     </div>
   )

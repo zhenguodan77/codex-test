@@ -2,10 +2,10 @@
 export type Mood = 'good' | 'bad' | 'insight' | 'calm'
 
 export const MOODS: { key: Mood; label: string; emoji: string; color: string }[] = [
-  { key: 'good', label: '明媚', emoji: '🌞', color: '#e8a33d' },
-  { key: 'bad', label: '阴霾', emoji: '🌧', color: '#7d8ba1' },
-  { key: 'insight', label: '顿悟', emoji: '💡', color: '#5f9e6e' },
-  { key: 'calm', label: '平静', emoji: '🌊', color: '#6b8cae' },
+  { key: 'good', label: '明媚', emoji: '🌞', color: '#FFAA2B' },
+  { key: 'bad', label: '阴霾', emoji: '🌧', color: '#94A3B8' },
+  { key: 'insight', label: '顿悟', emoji: '💡', color: '#34C77B' },
+  { key: 'calm', label: '平静', emoji: '🌊', color: '#5B8DEF' },
 ]
 
 export function moodOf(key: Mood) {

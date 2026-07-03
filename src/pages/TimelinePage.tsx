@@ -52,7 +52,7 @@ export default function TimelinePage({ entries, onDelete }: Props) {
             return (
               <article key={e.id} className="entry-card">
                 <div className="entry-top">
-                  <span className="entry-mood" style={{ background: m.color }}>
+                  <span className="entry-mood" style={{ background: `${m.color}1f`, color: m.color }}>
                     {m.emoji} {m.label}
                   </span>
                   <span className="entry-time">{fmtTime(e.createdAt)}</span>
