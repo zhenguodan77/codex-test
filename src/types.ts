@@ -1,11 +1,12 @@
 // 情绪类别：好的、坏的、领悟到的、平静的
 export type Mood = 'good' | 'bad' | 'insight' | 'calm'
 
-export const MOODS: { key: Mood; label: string; emoji: string; color: string }[] = [
-  { key: 'good', label: '明媚', emoji: '🌞', color: '#FFAA2B' },
-  { key: 'bad', label: '阴霾', emoji: '🌧', color: '#94A3B8' },
-  { key: 'insight', label: '顿悟', emoji: '💡', color: '#34C77B' },
-  { key: 'calm', label: '平静', emoji: '🌊', color: '#5B8DEF' },
+// 每种情绪一组渐变色（g1 → g2），用于渐变色球与环境光
+export const MOODS: { key: Mood; label: string; color: string; g1: string; g2: string }[] = [
+  { key: 'good', label: '明媚', color: '#D98E32', g1: '#F5CE84', g2: '#E09256' },
+  { key: 'bad', label: '阴霾', color: '#6B7A93', g1: '#AEB8C9', g2: '#5C6B84' },
+  { key: 'insight', label: '顿悟', color: '#57795F', g1: '#A5C4A1', g2: '#4E7A5A' },
+  { key: 'calm', label: '平静', color: '#5D82A8', g1: '#A9C6E2', g2: '#5D82A8' },
 ]
 
 export function moodOf(key: Mood) {

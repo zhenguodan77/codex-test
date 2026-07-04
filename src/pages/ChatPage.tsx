@@ -94,12 +94,18 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
     return (
       <div className="page chat-list">
         <header className="chat-head">
-          <h1>絮语</h1>
+          <div>
+            <div className="eyebrow">絮语</div>
+            <h1 className="display">
+              有些话，
+              <br />
+              说出来就轻了
+            </h1>
+          </div>
           <button className="icon-btn" onClick={() => setShowSettings(true)} title="设置">
             ⚙
           </button>
         </header>
-        <p className="slogan">像和老朋友说话一样，把心里的话说出来。</p>
         <button className="new-chat-btn" onClick={newChat}>
           ＋ 新建对话
         </button>
@@ -171,7 +177,7 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
 
       <div className="messages">
         {active.messages.length === 0 && !streaming && (
-          <div className="chat-empty">我在这儿。今天过得怎么样？</div>
+          <div className="chat-empty display">我在这儿。<br />今天过得怎么样？</div>
         )}
         {active.messages.map((m, i) => (
           <div key={i} className={`bubble ${m.role}`}>
