@@ -2,25 +2,32 @@
 export type Category = 'food' | 'fun' | 'insight' | 'mood' | 'daily'
 
 export const CATEGORIES: { key: Category; label: string; emoji: string; color: string }[] = [
-  { key: 'food', label: '美食', emoji: '🍜', color: '#FF9F0A' },
-  { key: 'fun', label: '趣事', emoji: '✨', color: '#BF5AF2' },
-  { key: 'insight', label: '感悟', emoji: '💡', color: '#34C759' },
-  { key: 'mood', label: '心情', emoji: '🌤', color: '#0A84FF' },
-  { key: 'daily', label: '日常', emoji: '☕', color: '#A2845E' },
+  { key: 'food', label: '美食', emoji: '🍜', color: '#F2762E' },
+  { key: 'fun', label: '趣事', emoji: '✨', color: '#F5A623' },
+  { key: 'insight', label: '感悟', emoji: '💡', color: '#7BA05B' },
+  { key: 'mood', label: '心情', emoji: '🌤', color: '#E8739E' },
+  { key: 'daily', label: '日常', emoji: '☕', color: '#B98A5E' },
 ]
 
 export function categoryOf(key: string | undefined) {
   return CATEGORIES.find((c) => c.key === key) ?? CATEGORIES[4]
 }
 
-// 一条记录：一行文字必填，正文和照片可选
+// 追记：在原记录上做的二次感悟
+export interface Echo {
+  ts: number
+  text: string
+}
+
+// 一条记录
 export interface Entry {
   id: string
   createdAt: number
   category: Category
-  line: string // 一句话记下这一刻
-  text?: string // 展开细说 / 日记正文
+  line: string // 经历 / 感悟 / 想法
+  text?: string // 旧版本的正文字段（兼容保留）
   photo?: string // 压缩后的 base64 图片
+  echoes?: Echo[] // 追记列表
 }
 
 export interface ChatMessage {

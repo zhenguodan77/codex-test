@@ -60,9 +60,26 @@ export default function App() {
         <span className="blob b4" />
       </div>
       <main className="main">
-        {tab === 'home' && <HomePage onSave={(e) => setEntries([e, ...entries])} />}
+        {tab === 'home' && (
+          <HomePage
+            onSave={(e) => {
+              setEntries([e, ...entries])
+              setTab('timeline') // 发布后自动跳到时光藤
+            }}
+          />
+        )}
         {tab === 'timeline' && (
-          <TimelinePage entries={entries} onDelete={(id) => setEntries(entries.filter((e) => e.id !== id))} />
+          <TimelinePage
+            entries={entries}
+            onDelete={(id) => setEntries(entries.filter((e) => e.id !== id))}
+            onEcho={(id, text) =>
+              setEntries(
+                entries.map((e) =>
+                  e.id === id ? { ...e, echoes: [...(e.echoes ?? []), { ts: Date.now(), text }] } : e,
+                ),
+              )
+            }
+          />
         )}
         {tab === 'chat' && (
           <ChatPage chats={chats} setChats={setChats} entries={entries} apiKey={apiKey} setApiKey={setApiKey} />
