@@ -26,9 +26,10 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
   const [echoDraft, setEchoDraft] = useState('')
 
   const sorted = [...entries].sort((a, b) => b.createdAt - a.createdAt)
-  const first = entries.length ? Math.min(...entries.map((e) => e.createdAt)) : null
+  // 记录覆盖的天数
+  const dayKeys = new Set(entries.map((e) => new Date(e.createdAt).toDateString()))
 
-  // 按日期分组，每组是一期「日刊」
+  // 按日期分组
   const groups: { key: string; ts: number; items: Entry[] }[] = []
   for (const e of sorted) {
     const key = fmtShort(e.createdAt)
@@ -47,129 +48,142 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
 
   return (
     <div className="page timeline">
-      {/* 刊头 */}
-      <header className="masthead">
-        <span className="masthead-mark">拾绪 · 时光</span>
-        <span className="masthead-date">
-          {first ? `自${fmtShort(first)}起 · 共 ${entries.length} 段` : '创刊号 · 待写入'}
-        </span>
+      <div className="glow" aria-hidden />
+      <header className="topbar">
+        <span className="topbar-label">时光</span>
+        <span className="topbar-meta">共 {entries.length} 则</span>
       </header>
 
-      {!first && (
-        <div className="blank-issue">
-          <h1 className="prompt">
-            第一期，
+      {entries.length ? (
+        <div className="hero-stat">
+          <span className="stat-num">{dayKeys.size}</span>
+          <span className="stat-unit">
+            天里的
             <br />
-            等你来写。
-          </h1>
-          <p className="empty-hint">回到「记录」，写下第一段时光。</p>
+            <b>{entries.length}</b> 个瞬间
+          </span>
         </div>
+      ) : (
+        <>
+          <h1 className="hero">还空着</h1>
+          <p className="hero-sub">回到「记录」，留下第一个瞬间。</p>
+        </>
       )}
 
-      {groups.map((g) => {
-        const d = new Date(g.ts)
-        return (
-          <section key={g.key} className="issue">
-            {/* 头版日期 */}
-            <div className="issue-date">
-              <span className="issue-num">{d.getDate()}</span>
-              <span className="issue-side">
-                {d.getMonth() + 1}月 · 星期{WEEKDAYS[d.getDay()]}
-              </span>
-              <span className="issue-count">{g.items.length} 则</span>
-            </div>
+      <div className="feed">
+        {groups.map((g) => {
+          const d = new Date(g.ts)
+          return (
+            <section key={g.key} className="day-block">
+              <div className="day-head">
+                <span className="day-key">{g.key}</span>
+                <span className="day-sub">星期{WEEKDAYS[d.getDay()]} · {g.items.length} 则</span>
+              </div>
 
-            <div className="issue-body">
               {g.items.map((e) => {
                 const c = categoryOf(e.category)
                 const echoes = e.echoes ?? []
                 return (
-                  <article key={e.id} className="piece">
-                    {e.photo && <img className="piece-photo" src={e.photo} alt="" loading="lazy" />}
-                    <div className="piece-head">
-                      <span className="piece-cat">{c.label}</span>
-                      <span className="piece-time">{fmtTime(e.createdAt)}</span>
-                    </div>
-                    <p className="piece-line">{e.line}</p>
-                    {e.text && <p className="piece-text">{e.text}</p>}
-
-                    {echoes.length > 0 && (
-                      <div className="echoes">
-                        {echoes.map((ec, i) => (
-                          <div key={i} className="echo">
-                            <div className="echo-meta">追记 · {fmtShort(ec.ts)} {fmtTime(ec.ts)}</div>
-                            <p className="echo-text">{ec.text}</p>
-                          </div>
-                        ))}
+                  <article key={e.id} className={`card ${e.photo ? 'has-photo' : ''}`}>
+                    {e.photo && (
+                      <div className="card-media">
+                        <img src={e.photo} alt="" loading="lazy" />
+                        <span className="media-tag" style={{ background: c.color }}>
+                          {c.label}
+                        </span>
                       </div>
                     )}
+                    <div className="card-body">
+                      {!e.photo && (
+                        <div className="card-head">
+                          <span className="chip" style={{ color: c.color, background: `${c.color}1f` }}>
+                            {c.label}
+                          </span>
+                          <span className="card-time">{fmtTime(e.createdAt)}</span>
+                        </div>
+                      )}
+                      <p className="card-line">{e.line}</p>
+                      {e.text && <p className="card-text">{e.text}</p>}
+                      {e.photo && <span className="card-time photo-time">{fmtTime(e.createdAt)}</span>}
 
-                    {echoFor === e.id ? (
-                      <div className="echo-composer">
-                        <textarea
-                          className="echo-input"
-                          value={echoDraft}
-                          rows={3}
-                          maxLength={300}
-                          placeholder="今天再看这条记录，有什么新的想法？"
-                          onChange={(ev) => setEchoDraft(ev.target.value)}
-                          autoFocus
-                        />
-                        <div className="echo-ops">
-                          <button className="echo-save" onClick={() => saveEcho(e.id)}>
-                            保存追记
-                          </button>
+                      {echoes.length > 0 && (
+                        <div className="echoes">
+                          {echoes.map((ec, i) => (
+                            <div key={i} className="echo" style={{ borderColor: c.color }}>
+                              <div className="echo-meta">追记 · {fmtShort(ec.ts)} {fmtTime(ec.ts)}</div>
+                              <p className="echo-text">{ec.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {echoFor === e.id ? (
+                        <div className="echo-composer">
+                          <textarea
+                            className="echo-input"
+                            value={echoDraft}
+                            rows={3}
+                            maxLength={300}
+                            placeholder="今天再看这条记录，有什么新的想法？"
+                            onChange={(ev) => setEchoDraft(ev.target.value)}
+                            autoFocus
+                          />
+                          <div className="echo-ops">
+                            <button className="echo-save" onClick={() => saveEcho(e.id)}>
+                              保存追记
+                            </button>
+                            <button
+                              className="echo-cancel"
+                              onClick={() => {
+                                setEchoFor(null)
+                                setEchoDraft('')
+                              }}
+                            >
+                              取消
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="entry-actions">
                           <button
-                            className="echo-cancel"
+                            className="echo-btn"
                             onClick={() => {
-                              setEchoFor(null)
+                              setEchoFor(e.id)
                               setEchoDraft('')
                             }}
                           >
-                            取消
+                            ＋ 追记
                           </button>
+                          {confirmId === e.id ? (
+                            <span className="del-group">
+                              <button
+                                className="entry-del confirm"
+                                onClick={() => {
+                                  onDelete(e.id)
+                                  setConfirmId(null)
+                                }}
+                              >
+                                确认删除
+                              </button>
+                              <button className="entry-del" onClick={() => setConfirmId(null)}>
+                                取消
+                              </button>
+                            </span>
+                          ) : (
+                            <button className="entry-del" onClick={() => setConfirmId(e.id)}>
+                              删除
+                            </button>
+                          )}
                         </div>
-                      </div>
-                    ) : (
-                      <div className="entry-actions">
-                        <button
-                          className="echo-btn"
-                          onClick={() => {
-                            setEchoFor(e.id)
-                            setEchoDraft('')
-                          }}
-                        >
-                          ✎ 追记
-                        </button>
-                        {confirmId === e.id ? (
-                          <span className="del-group">
-                            <button
-                              className="entry-del confirm"
-                              onClick={() => {
-                                onDelete(e.id)
-                                setConfirmId(null)
-                              }}
-                            >
-                              确认删除
-                            </button>
-                            <button className="entry-del" onClick={() => setConfirmId(null)}>
-                              取消
-                            </button>
-                          </span>
-                        ) : (
-                          <button className="entry-del" onClick={() => setConfirmId(e.id)}>
-                            删除
-                          </button>
-                        )}
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </article>
                 )
               })}
-            </div>
-          </section>
-        )
-      })}
+            </section>
+          )
+        })}
+      </div>
     </div>
   )
 }

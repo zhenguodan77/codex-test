@@ -93,16 +93,17 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
   if (!active) {
     return (
       <div className="page chat-list">
-        <header className="masthead">
-          <span className="masthead-mark">拾绪 · 絮语</span>
-          <button className="icon-btn glass" onClick={() => setShowSettings(true)} title="设置">
+        <div className="glow" aria-hidden />
+        <header className="topbar">
+          <span className="topbar-label">絮语</span>
+          <button className="icon-btn" onClick={() => setShowSettings(true)} title="设置">
             ⚙
           </button>
         </header>
-        <h1 className="prompt">
+        <h1 className="hero">
           有些话，
           <br />
-          说出来就轻了。
+          说出来就轻了
         </h1>
         <button className="new-chat-btn" onClick={newChat}>
           ＋ 新建对话
