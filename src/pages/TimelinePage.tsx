@@ -58,24 +58,26 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
 
   return (
     <div className="page timeline">
-      <div className="sun" aria-hidden />
       <header className="page-head">
-        <div className="eyebrow">时光藤 {stage(entries.length)}</div>
-        <h1>
-          {first ? (
-            <>
-              自 {fmtDate(first)}起，
-              <br />
-              已挂上 <em className="count">{entries.length}</em> 段时光
-            </>
-          ) : (
-            <>
-              藤还空着，
+        <div className="eyebrow">时光 {stage(entries.length)}</div>
+        {first ? (
+          <>
+            <h1 className="stat">
+              <em className="count">{entries.length}</em>
+              <span className="unit">段时光</span>
+            </h1>
+            <p className="lede">自 {fmtDate(first)}起，一直在生长。</p>
+          </>
+        ) : (
+          <>
+            <h1>
+              还空着，
               <br />
               去挂上第一段时光吧
-            </>
-          )}
-        </h1>
+            </h1>
+            <p className="lede empty-hint">回到「记录」，从今天开始。</p>
+          </>
+        )}
       </header>
 
       <div className="vine">
@@ -89,7 +91,6 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                 <article key={e.id} className="entry">
                   <span className="fruit" style={{ background: c.color }} />
                   <div className="tag-card">
-                    <span className="tag-hole" />
                     <div className="entry-top">
                       <span className="entry-tag" style={{ color: c.color }}>
                         {c.emoji} {c.label}

@@ -2,11 +2,11 @@
 export type Category = 'food' | 'fun' | 'insight' | 'mood' | 'daily'
 
 export const CATEGORIES: { key: Category; label: string; emoji: string; color: string }[] = [
-  { key: 'food', label: '美食', emoji: '🍜', color: '#F2762E' },
-  { key: 'fun', label: '趣事', emoji: '✨', color: '#F5A623' },
-  { key: 'insight', label: '感悟', emoji: '💡', color: '#7BA05B' },
-  { key: 'mood', label: '心情', emoji: '🌤', color: '#E8739E' },
-  { key: 'daily', label: '日常', emoji: '☕', color: '#B98A5E' },
+  { key: 'food', label: '美食', emoji: '🍜', color: '#FF5C38' },
+  { key: 'fun', label: '趣事', emoji: '✨', color: '#FFAA1E' },
+  { key: 'insight', label: '感悟', emoji: '💡', color: '#57B26A' },
+  { key: 'mood', label: '心情', emoji: '🌤', color: '#FF7BAC' },
+  { key: 'daily', label: '日常', emoji: '☕', color: '#9C8B72' },
 ]
 
 export function categoryOf(key: string | undefined) {

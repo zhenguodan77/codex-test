@@ -41,7 +41,7 @@ export default function HomePage({ onSave }: Props) {
 
   function publish() {
     if (!content.trim() && !photo) {
-      showToast('拍一张，或写一句，再挂上去吧')
+      showToast('拍一张，或写一句，再完成吧')
       return
     }
     onSave({
@@ -59,19 +59,15 @@ export default function HomePage({ onSave }: Props) {
 
   return (
     <div className="page capture">
-      <div className="sun" aria-hidden />
       <header className="page-head">
         <div className="eyebrow">
-          {today.getMonth() + 1}月{today.getDate()}日 星期{WEEKDAYS[today.getDay()]}
+          {today.getMonth() + 1}月{today.getDate()}日 · 星期{WEEKDAYS[today.getDay()]}
         </div>
-        <h1>
-          {greeting(today.getHours())}，
-          <br />
-          把这一刻挂上时光藤
-        </h1>
+        <h1>{greeting(today.getHours())}</h1>
+        <p className="lede">好的、坏的，都值得留下。</p>
       </header>
 
-      {/* 拍照区：先拍照 */}
+      {/* 视觉锤：日出渐变拍照区 */}
       {photo ? (
         <div className="shot-preview">
           <img src={photo} alt="此刻" />
@@ -80,21 +76,20 @@ export default function HomePage({ onSave }: Props) {
           </button>
         </div>
       ) : (
-        <button className="shot-card" onClick={() => cameraRef.current?.click()}>
-          <span className="shot-icon">
+        <button className="hero-shot" onClick={() => cameraRef.current?.click()}>
+          <span className="hero-icon">
             <CameraIcon />
           </span>
-          <span className="shot-title">拍下此刻</span>
-          <span className="shot-sub">好的、坏的，都值得留下</span>
+          <span className="hero-title">拍下此刻</span>
+          <span className="hero-sub">轻触打开相机</span>
         </button>
       )}
       {!photo && (
         <button className="album-link" onClick={() => uploadRef.current?.click()}>
-          或从相册选择一张
+          从相册选择
         </button>
       )}
 
-      {/* 配文：经历 / 感悟 / 想法 */}
       <div className="write-card">
         <textarea
           className="capture-text"
@@ -109,10 +104,10 @@ export default function HomePage({ onSave }: Props) {
             <button
               key={c.key}
               className={`cat-chip ${category === c.key ? 'active' : ''}`}
-              style={category === c.key ? { background: c.color, borderColor: c.color } : {}}
               onClick={() => setCategory(c.key)}
             >
-              {c.emoji} {c.label}
+              <span className="cat-dot" style={{ background: c.color }} />
+              {c.label}
             </button>
           ))}
         </div>
@@ -143,7 +138,7 @@ export default function HomePage({ onSave }: Props) {
       <button className="save-btn" onClick={publish}>
         完 成
       </button>
-      <p className="footnote">发布后会自动挂到「时光藤」上</p>
+      <p className="footnote">发布后自动挂上「时光」</p>
 
       {toast && <div className="toast">{toast}</div>}
     </div>
