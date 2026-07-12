@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Entry } from '../types'
-import { moodOf } from '../types'
+import { categoryOf } from '../types'
 
 interface Props {
   entries: Entry[]
@@ -38,78 +38,70 @@ export default function TimelinePage({ entries, onDelete }: Props) {
 
   return (
     <div className="page timeline">
-      <header className="timeline-head">
+      <header className="page-head">
         <div className="eyebrow">时光</div>
-        <h1 className="display">
+        <h1>
           {first ? (
             <>
-              自 {fmtDate(first)}，
+              自 {fmtDate(first)}起，
               <br />
-              已拾起 <em>{entries.length}</em> 缕情绪
+              已记下 <em className="count">{entries.length}</em> 个瞬间
             </>
           ) : (
             <>
               时间还空着，
               <br />
-              等你拾起第一缕
+              等你记下第一个瞬间
             </>
           )}
         </h1>
       </header>
 
-      {!first && <p className="empty-hint">回到「记录」，从此刻开始。</p>}
+      {!first && <p className="empty-hint">回到「记录」，从今天开始。</p>}
 
-      <div className="rail">
-        {groups.map((g) => (
-          <section key={g.date} className="day-group">
-            <div className="day-label">{g.date}</div>
-            {g.items.map((e) => {
-              const m = moodOf(e.mood)
-              return (
-                <article key={e.id} className="entry">
-                  <span
-                    className="entry-dot"
-                    style={{ background: `radial-gradient(circle at 32% 28%, ${m.g1}, ${m.g2})` }}
-                  />
-                  <div className="entry-card">
-                    <div className="entry-top">
-                      <span className="entry-mood" style={{ color: m.color }}>
-                        {m.label}
-                      </span>
-                      <span className="entry-time">{fmtTime(e.createdAt)}</span>
-                    </div>
-                    <p className="entry-line display">{e.line}</p>
-                    {e.photo && <img className="entry-photo" src={e.photo} alt="" loading="lazy" />}
-                    {e.text && <p className="entry-text">{e.text}</p>}
-                    <div className="entry-actions">
-                      {confirmId === e.id ? (
-                        <>
-                          <button
-                            className="entry-del confirm"
-                            onClick={() => {
-                              onDelete(e.id)
-                              setConfirmId(null)
-                            }}
-                          >
-                            确认删除
-                          </button>
-                          <button className="entry-del" onClick={() => setConfirmId(null)}>
-                            取消
-                          </button>
-                        </>
-                      ) : (
-                        <button className="entry-del" onClick={() => setConfirmId(e.id)}>
-                          删除
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              )
-            })}
-          </section>
-        ))}
-      </div>
+      {groups.map((g) => (
+        <section key={g.date} className="day-group">
+          <div className="day-label">{g.date}</div>
+          {g.items.map((e) => {
+            const c = categoryOf(e.category)
+            return (
+              <article key={e.id} className="glass entry-card">
+                <div className="entry-top">
+                  <span className="entry-tag" style={{ background: `${c.color}1c`, color: c.color }}>
+                    {c.emoji} {c.label}
+                  </span>
+                  <span className="entry-time">{fmtTime(e.createdAt)}</span>
+                </div>
+                <p className="entry-line">{e.line}</p>
+                {e.photo && <img className="entry-photo" src={e.photo} alt="" loading="lazy" />}
+                {e.text && <p className="entry-text">{e.text}</p>}
+                <div className="entry-actions">
+                  {confirmId === e.id ? (
+                    <>
+                      <button
+                        className="entry-del confirm"
+                        onClick={() => {
+                          onDelete(e.id)
+                          setConfirmId(null)
+                        }}
+                      >
+                        确认删除
+                      </button>
+                      <button className="entry-del" onClick={() => setConfirmId(null)}>
+                        取消
+                      </button>
+                    </>
+                  ) : (
+                    <button className="entry-del" onClick={() => setConfirmId(e.id)}>
+                      删除
+                    </button>
+                  )}
+                </div>
+              </article>
+            )
+          })}
+        </section>
+      ))}
     </div>
   )
 }

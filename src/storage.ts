@@ -14,7 +14,21 @@ function load<T>(key: string, fallback: T): T {
 }
 
 export function loadEntries(): Entry[] {
-  return load<Entry[]>(ENTRIES_KEY, [])
+  const raw = load<(Entry & { mood?: string })[]>(ENTRIES_KEY, [])
+  // 旧版本用 mood 字段（情绪），迁移到 category（生活分类）
+  const moodMap: Record<string, Entry['category']> = {
+    good: 'mood',
+    bad: 'mood',
+    insight: 'insight',
+    calm: 'daily',
+  }
+  return raw.map((e) => {
+    if (!e.category && e.mood) {
+      const { mood, ...rest } = e
+      return { ...rest, category: moodMap[mood] ?? 'daily' }
+    }
+    return e
+  })
 }
 
 export function saveEntries(entries: Entry[]) {

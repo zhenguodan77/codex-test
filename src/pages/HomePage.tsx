@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
-import type { Entry, Mood } from '../types'
-import { MOODS, moodOf } from '../types'
+import type { Category, Entry } from '../types'
+import { CATEGORIES } from '../types'
 import { compressImage, uid } from '../storage'
 
 interface Props {
@@ -9,8 +9,16 @@ interface Props {
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
+const PLACEHOLDERS: Record<Category, string> = {
+  food: '今天吃了个波龙 🦞',
+  fun: '路上看到两只猫在打架',
+  insight: '原来慢下来也是一种前进',
+  mood: '今天心里是晴天',
+  daily: '平平无奇但也值得记下的一天',
+}
+
 export default function HomePage({ onSave }: Props) {
-  const [mood, setMood] = useState<Mood>('good')
+  const [category, setCategory] = useState<Category>('food')
   const [line, setLine] = useState('')
   const [text, setText] = useState('')
   const [photo, setPhoto] = useState<string | undefined>()
@@ -35,13 +43,13 @@ export default function HomePage({ onSave }: Props) {
 
   function save() {
     if (!line.trim() && !text.trim() && !photo) {
-      showToast('留下一点什么再拾起吧')
+      showToast('留下一点什么再保存吧')
       return
     }
     onSave({
       id: uid(),
       createdAt: Date.now(),
-      mood,
+      category,
       line: line.trim() || '此刻，无需多言',
       text: text.trim() || undefined,
       photo,
@@ -50,53 +58,44 @@ export default function HomePage({ onSave }: Props) {
     setText('')
     setPhoto(undefined)
     setShowText(false)
-    showToast('已拾起这一缕情绪')
+    showToast('已记下这一刻 ✓')
   }
 
   const today = new Date()
-  const active = moodOf(mood)
 
   return (
     <div className="page home">
-      {/* 随所选情绪变化的环境光 */}
-      <div
-        className="ambient"
-        style={{ background: `radial-gradient(120% 70% at 50% -20%, ${active.g1}55 0%, ${active.g2}18 45%, transparent 75%)` }}
-      />
-
-      <header className="home-head">
+      <header className="page-head">
         <div className="eyebrow">
-          {today.getMonth() + 1}月{today.getDate()}日 · 星期{WEEKDAYS[today.getDay()]}
+          {today.getMonth() + 1}月{today.getDate()}日 星期{WEEKDAYS[today.getDay()]}
         </div>
-        <h1 className="display">
-          此刻，
-          <br />
-          心里是什么天气？
-        </h1>
+        <h1>今天，想记点什么？</h1>
       </header>
 
-      <div className="mood-row">
-        {MOODS.map((m) => (
+      <div className="cat-row">
+        {CATEGORIES.map((c) => (
           <button
-            key={m.key}
-            className={`mood ${mood === m.key ? 'active' : ''}`}
-            onClick={() => setMood(m.key)}
+            key={c.key}
+            className={`cat-chip ${category === c.key ? 'active' : ''}`}
+            style={
+              category === c.key
+                ? { background: c.color, borderColor: 'transparent', boxShadow: `0 6px 20px ${c.color}59` }
+                : {}
+            }
+            onClick={() => setCategory(c.key)}
           >
-            <span
-              className="orb"
-              style={{ background: `radial-gradient(circle at 32% 28%, ${m.g1}, ${m.g2})`, boxShadow: mood === m.key ? `0 6px 18px ${m.g2}66` : 'none' }}
-            />
-            <span className="mood-name">{m.label}</span>
+            <span className="cat-emoji">{c.emoji}</span>
+            {c.label}
           </button>
         ))}
       </div>
 
-      <div className="sheet">
+      <div className="glass sheet">
         <input
           className="line-input"
           value={line}
-          maxLength={50}
-          placeholder="用一行字，说说此刻"
+          maxLength={60}
+          placeholder={PLACEHOLDERS[category]}
           onChange={(e) => setLine(e.target.value)}
         />
 
@@ -113,7 +112,7 @@ export default function HomePage({ onSave }: Props) {
               <CameraIcon /> 拍摄当下
             </button>
             <button className="photo-btn" onClick={() => uploadRef.current?.click()}>
-              <ImageIcon /> 上传照片
+              <ImageIcon /> 相册选取
             </button>
           </div>
         )}
@@ -123,13 +122,13 @@ export default function HomePage({ onSave }: Props) {
             className="text-input"
             value={text}
             rows={5}
-            placeholder="发生了什么？也可以当日记写，想写多少写多少"
+            placeholder="展开说说？发生了什么、和谁一起、什么感觉，都可以写"
             onChange={(e) => setText(e.target.value)}
             autoFocus
           />
         ) : (
           <button className="ghost-btn" onClick={() => setShowText(true)}>
-            ＋ 写点发生的事，或今天的日记
+            ＋ 展开细说，或写今天的日记
           </button>
         )}
       </div>
@@ -157,7 +156,7 @@ export default function HomePage({ onSave }: Props) {
       />
 
       <button className="save-btn" onClick={save}>
-        拾起这一刻
+        记下这一刻
       </button>
       <p className="footnote">一生那么冗长，值得被记下的远比想象的多。</p>
 

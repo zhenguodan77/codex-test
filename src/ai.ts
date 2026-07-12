@@ -1,8 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ChatMessage, Entry } from './types'
-import { moodOf } from './types'
+import { categoryOf } from './types'
 
-const SYSTEM_PROMPT = `你是「拾绪」里的一位老朋友。用户在这个 app 里记录自己一生中好的情绪、坏的情绪、领悟到的情绪。
+const SYSTEM_PROMPT = `你是「拾绪」里的一位老朋友。用户在这个 app 里记录每天的生活：吃到的好东西、遇到的趣事、领悟到的道理、当下的心情。
 
 你说话像深夜里坐在对面的朋友：温和、真诚、不说教。
 - 用口语化的中文，回复通常两三句，不要长篇大论
@@ -18,7 +18,7 @@ function entriesContext(entries: Entry[]): string {
     const d = new Date(e.createdAt)
     const date = `${d.getMonth() + 1}月${d.getDate()}日`
     const body = e.text ? `：${e.text.slice(0, 60)}` : ''
-    return `- ${date}（${moodOf(e.mood).label}）${e.line}${body}`
+    return `- ${date}（${categoryOf(e.category).label}）${e.line}${body}`
   })
   return `\n\n以下是用户最近在拾绪里的记录，仅在对方聊到相关话题时自然地参考，不要主动逐条提起：\n${lines.join('\n')}`
 }

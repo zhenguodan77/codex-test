@@ -93,16 +93,16 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
   if (!active) {
     return (
       <div className="page chat-list">
-        <header className="chat-head">
+        <header className="chat-head page-head">
           <div>
             <div className="eyebrow">絮语</div>
-            <h1 className="display">
+            <h1>
               有些话，
               <br />
               说出来就轻了
             </h1>
           </div>
-          <button className="icon-btn" onClick={() => setShowSettings(true)} title="设置">
+          <button className="icon-btn glass" onClick={() => setShowSettings(true)} title="设置">
             ⚙
           </button>
         </header>
@@ -177,7 +177,7 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
 
       <div className="messages">
         {active.messages.length === 0 && !streaming && (
-          <div className="chat-empty display">我在这儿。<br />今天过得怎么样？</div>
+          <div className="chat-empty">我在这儿。<br />今天过得怎么样？</div>
         )}
         {active.messages.map((m, i) => (
           <div key={i} className={`bubble ${m.role}`}>

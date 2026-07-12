@@ -52,6 +52,13 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* 毛玻璃底下的彩色光斑壁纸 */}
+      <div className="bg-canvas" aria-hidden>
+        <span className="blob b1" />
+        <span className="blob b2" />
+        <span className="blob b3" />
+        <span className="blob b4" />
+      </div>
       <main className="main">
         {tab === 'home' && <HomePage onSave={(e) => setEntries([e, ...entries])} />}
         {tab === 'timeline' && (
