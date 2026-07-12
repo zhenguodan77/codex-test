@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { Entry } from '../types'
-import { categoryOf } from '../types'
 
 interface Props {
   entries: Entry[]
@@ -74,16 +73,14 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
               </div>
 
               {g.items.map((e) => {
-                const c = categoryOf(e.category)
                 const echoes = e.echoes ?? []
                 return (
                   <article key={e.id} className="card">
                     <div className="card-head">
-                      <span className="cat-label" style={{ color: c.color }}>
-                        <span className="cat-dot" style={{ background: c.color }} />
-                        {c.label}
+                      <span className="card-time">
+                        <span className="time-dot" />
+                        {fmtTime(e.createdAt)}
                       </span>
-                      <span className="card-time">{fmtTime(e.createdAt)}</span>
                     </div>
 
                     {e.photo && (
@@ -99,7 +96,7 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                       <div className="echoes">
                         {echoes.map((ec, i) => (
                           <div key={i} className="echo">
-                            <span className="echo-dot" style={{ background: c.color }} />
+                            <span className="echo-dot" />
                             <div>
                               <div className="echo-meta">追记 · {fmtShort(ec.ts)} {fmtTime(ec.ts)}</div>
                               <p className="echo-text">{ec.text}</p>

@@ -23,7 +23,7 @@ export interface Echo {
 export interface Entry {
   id: string
   createdAt: number
-  category: Category
+  category?: Category // 旧版本字段，兼容保留，新记录不再使用
   line: string // 经历 / 感悟 / 想法
   text?: string // 旧版本的正文字段（兼容保留）
   photo?: string // 压缩后的 base64 图片

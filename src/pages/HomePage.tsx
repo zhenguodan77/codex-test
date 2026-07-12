@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
-import type { Category, Entry } from '../types'
-import { CATEGORIES } from '../types'
+import type { Entry } from '../types'
 import { compressImage, uid } from '../storage'
 
 interface Props {
@@ -9,16 +8,7 @@ interface Props {
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
-function greeting(h: number) {
-  if (h < 5) return '夜深了'
-  if (h < 11) return '早上好'
-  if (h < 14) return '中午好'
-  if (h < 18) return '下午好'
-  return '晚上好'
-}
-
 export default function HomePage({ onSave }: Props) {
-  const [category, setCategory] = useState<Category>('daily')
   const [content, setContent] = useState('')
   const [photo, setPhoto] = useState<string | undefined>()
   const [toast, setToast] = useState('')
@@ -47,7 +37,6 @@ export default function HomePage({ onSave }: Props) {
     onSave({
       id: uid(),
       createdAt: Date.now(),
-      category,
       line: content.trim() || '此刻，无需多言',
       photo,
     })
@@ -60,24 +49,25 @@ export default function HomePage({ onSave }: Props) {
   return (
     <div className="page capture">
       <header className="topbar">
-        <span className="topbar-label">记录</span>
+        <span className="topbar-label">拾绪</span>
         <span className="topbar-meta">
           {today.getMonth() + 1}月{today.getDate()}日 星期{WEEKDAYS[today.getDay()]}
         </span>
       </header>
 
-      <h1 className="page-title">{greeting(today.getHours())}</h1>
+      <h1 className="page-title">记录</h1>
       <p className="page-desc">此刻正在发生的，都值得留下。</p>
 
-      {/* 撰写卡：文字 + 照片合为一体 */}
       <div className="compose">
-        <textarea
-          className="compose-text"
+        <input
+          className="compose-line"
           value={content}
-          rows={5}
-          maxLength={500}
-          placeholder="写下正在发生的、想留住的…"
+          maxLength={60}
+          placeholder="写下此刻，一句话就好…"
           onChange={(e) => setContent(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') publish()
+          }}
         />
 
         {photo ? (
@@ -88,30 +78,23 @@ export default function HomePage({ onSave }: Props) {
             </button>
           </div>
         ) : (
-          <div className="compose-tools">
-            <button className="tool" onClick={() => cameraRef.current?.click()}>
-              <CameraIcon /> 拍摄
+          <div className="compose-actions">
+            <button className="big-tool primary" onClick={() => cameraRef.current?.click()}>
+              <span className="tool-badge">
+                <CameraIcon />
+              </span>
+              <span className="tool-label">拍摄</span>
+              <span className="tool-sub">打开相机</span>
             </button>
-            <button className="tool" onClick={() => uploadRef.current?.click()}>
-              <ImageIcon /> 相册
+            <button className="big-tool" onClick={() => uploadRef.current?.click()}>
+              <span className="tool-badge">
+                <ImageIcon />
+              </span>
+              <span className="tool-label">相册</span>
+              <span className="tool-sub">选一张</span>
             </button>
           </div>
         )}
-      </div>
-
-      {/* 分类 */}
-      <div className="cat-row">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.key}
-            className={`cat-chip ${category === c.key ? 'active' : ''}`}
-            style={category === c.key ? { borderColor: c.color, background: `${c.color}14` } : {}}
-            onClick={() => setCategory(c.key)}
-          >
-            <span className="cat-dot" style={{ background: c.color }} />
-            {c.label}
-          </button>
-        ))}
       </div>
 
       <input
@@ -147,7 +130,7 @@ export default function HomePage({ onSave }: Props) {
 
 function CameraIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14.5 4h-5L7.5 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3.5Z" />
       <circle cx="12" cy="13" r="3.5" />
     </svg>
@@ -156,7 +139,7 @@ function CameraIcon() {
 
 function ImageIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="18" height="18" rx="3" />
       <circle cx="9" cy="9" r="1.8" />
       <path d="m21 15-4.5-4.5L7 20" />
