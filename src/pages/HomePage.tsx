@@ -3,12 +3,13 @@ import type { Entry } from '../types'
 import { compressImage, uid } from '../storage'
 
 interface Props {
+  count: number
   onSave: (entry: Entry) => void
 }
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
-export default function HomePage({ onSave }: Props) {
+export default function HomePage({ count, onSave }: Props) {
   const [content, setContent] = useState('')
   const [photo, setPhoto] = useState<string | undefined>()
   const [toast, setToast] = useState('')
@@ -48,37 +49,38 @@ export default function HomePage({ onSave }: Props) {
 
   return (
     <div className="page capture">
-      <header className="topbar">
-        <span className="topbar-label">拾绪</span>
-        <span className="topbar-meta">
-          {today.getMonth() + 1}月{today.getDate()}日 星期{WEEKDAYS[today.getDay()]}
-        </span>
-      </header>
-
-      <h1 className="page-title">记录</h1>
-      <p className="page-desc">此刻正在发生的，都值得留下。</p>
-
-      <div className="compose">
+      {/* 居中主体 */}
+      <div className="capture-hero">
+        <div className="halo" aria-hidden />
+        <div className="hero-eyebrow">
+          拾绪 · {today.getMonth() + 1}月{today.getDate()}日 星期{WEEKDAYS[today.getDay()]}
+        </div>
+        <h1 className="big-title">记录</h1>
+        <p className="big-desc">写下此刻，一句话就好</p>
         <input
-          className="compose-line"
+          className="hero-input"
           value={content}
           maxLength={60}
-          placeholder="写下此刻，一句话就好…"
+          placeholder="此刻正在发生的…"
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') publish()
           }}
         />
+        {count > 0 && <div className="hero-count">至今已留下 {count} 个瞬间</div>}
+      </div>
 
+      {/* 底部：拍摄 / 相册 + 完成 */}
+      <div className="capture-foot">
         {photo ? (
-          <div className="compose-photo">
+          <div className="foot-photo">
             <img src={photo} alt="此刻" />
             <button className="photo-remove" onClick={() => setPhoto(undefined)}>
               ✕
             </button>
           </div>
         ) : (
-          <div className="compose-actions">
+          <div className="foot-tools">
             <button className="big-tool primary" onClick={() => cameraRef.current?.click()}>
               <span className="tool-badge">
                 <CameraIcon />
@@ -95,6 +97,10 @@ export default function HomePage({ onSave }: Props) {
             </button>
           </div>
         )}
+
+        <button className="save-btn" onClick={publish}>
+          完成
+        </button>
       </div>
 
       <input
@@ -118,10 +124,6 @@ export default function HomePage({ onSave }: Props) {
           e.target.value = ''
         }}
       />
-
-      <button className="save-btn" onClick={publish}>
-        完成
-      </button>
 
       {toast && <div className="toast">{toast}</div>}
     </div>

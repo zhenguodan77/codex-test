@@ -62,9 +62,10 @@ export default function App() {
       <main className="main">
         {tab === 'home' && (
           <HomePage
+            count={entries.length}
             onSave={(e) => {
               setEntries([e, ...entries])
-              setTab('timeline') // 发布后自动跳到时光藤
+              setTab('timeline') // 发布后自动跳到时光页
             }}
           />
         )}

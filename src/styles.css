@@ -3,12 +3,12 @@
    核心不在颜色，在于统一的间距、层级与留白 */
 
 :root {
-  --bg: #f2efe9;
+  --bg: #f4f1ea;
   --card: #fdfbf7;
   --ink: #37322c;
   --ink-2: #7b746a;
   --ink-3: #aca498;
-  --clay: #bd7350;
+  --clay: #c57c72;
   --clay-ink: #ffffff;
   --line: #e8e2d6;
   --line-soft: #efeae0;
@@ -177,45 +177,129 @@ textarea {
   background: var(--clay);
   color: var(--clay-ink);
   padding: 11px 19px;
-  box-shadow: 0 4px 12px rgba(189, 115, 80, 0.32);
+  box-shadow: 0 4px 12px rgba(197, 124, 114, 0.32);
 }
 
 .tab.active .tab-label {
   display: inline;
 }
 
-/* ————— 记录页：撰写卡 ————— */
-.compose {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  margin-bottom: 24px;
+/* ————— 记录页：居中构图 ————— */
+.capture {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-top: 8px;
+  padding-bottom: calc(98px + env(safe-area-inset-bottom));
 }
 
-.compose-line {
+.capture-hero {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-bottom: 12px;
+}
+
+/* 标题背后的柔和光晕（点缀 + 带出玫瑰陶土色） */
+.halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -62%);
+  background: radial-gradient(circle, rgba(197, 124, 114, 0.16) 0%, rgba(230, 190, 165, 0.08) 42%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.capture-hero > *:not(.halo) {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 14px;
+}
+
+.big-title {
+  margin: 0;
+  font-size: 66px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.big-desc {
+  margin: 16px 0 26px;
+  font-size: 15px;
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+}
+
+.hero-input {
   width: 100%;
+  max-width: 320px;
   border: none;
+  border-bottom: 1.5px solid var(--line);
   background: none;
-  font-size: 16.5px;
+  text-align: center;
+  font-size: 17px;
   color: var(--ink);
   outline: none;
-  padding: 17px 18px;
-  display: block;
+  padding: 12px 8px;
+  transition: border-color 0.2s;
 }
 
-.compose-line::placeholder,
+.hero-input:focus {
+  border-bottom-color: var(--clay);
+}
+
+.hero-input::placeholder,
 .echo-input::placeholder,
 .chat-input::placeholder {
   color: var(--ink-3);
 }
 
-.compose-actions {
+.hero-count {
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+
+/* 底部操作区 */
+.capture-foot {
+  padding-top: 8px;
+}
+
+.foot-tools {
   display: flex;
   gap: 10px;
-  padding: 12px;
-  border-top: 1px solid var(--line-soft);
+  margin-bottom: 12px;
+}
+
+.foot-photo {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.foot-photo img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--r);
+  display: block;
 }
 
 .big-tool {
@@ -256,7 +340,7 @@ textarea {
 .big-tool.primary .tool-badge {
   background: var(--clay);
   color: var(--clay-ink);
-  box-shadow: 0 4px 12px rgba(189, 115, 80, 0.3);
+  box-shadow: 0 4px 12px rgba(197, 124, 114, 0.3);
 }
 
 .tool-label {
@@ -268,17 +352,6 @@ textarea {
 .tool-sub {
   font-size: 11.5px;
   color: var(--ink-3);
-}
-
-.compose-photo {
-  position: relative;
-  margin: 12px;
-}
-
-.compose-photo img {
-  width: 100%;
-  border-radius: 12px;
-  display: block;
 }
 
 .photo-remove {
@@ -306,7 +379,7 @@ textarea {
   padding: 16px 0;
   letter-spacing: 0.24em;
   text-indent: 0.24em;
-  box-shadow: 0 8px 22px rgba(189, 115, 80, 0.28);
+  box-shadow: 0 8px 22px rgba(197, 124, 114, 0.28);
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
@@ -580,7 +653,7 @@ textarea {
   font-weight: 600;
   letter-spacing: 0.02em;
   margin-bottom: 16px;
-  box-shadow: 0 8px 22px rgba(189, 115, 80, 0.24);
+  box-shadow: 0 8px 22px rgba(197, 124, 114, 0.24);
 }
 
 .chat-item {
