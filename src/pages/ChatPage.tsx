@@ -93,18 +93,14 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
   if (!active) {
     return (
       <div className="page chat-list">
-        <div className="glow" aria-hidden />
         <header className="topbar">
           <span className="topbar-label">絮语</span>
           <button className="icon-btn" onClick={() => setShowSettings(true)} title="设置">
             ⚙
           </button>
         </header>
-        <h1 className="hero">
-          有些话，
-          <br />
-          说出来就轻了
-        </h1>
+        <h1 className="page-title">有些话，说出来就轻了</h1>
+        <p className="page-desc">像和老朋友聊天一样。</p>
         <button className="new-chat-btn" onClick={newChat}>
           ＋ 新建对话
         </button>

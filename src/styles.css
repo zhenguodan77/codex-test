@@ -1,20 +1,22 @@
-/* ————— 拾绪 · 设计系统 v7「暗场 · 电光」 —————
-   深色打底 + 电光柠檬绿强调 + 超大无衬线粗体
-   参照当代科技/时尚品牌应用的视觉语言 */
+/* ————— 拾绪 · 设计系统 v8「暖砂」 —————
+   克制的暖中性色：燕麦底 + 陶土点缀 + 暖灰文字
+   核心不在颜色，在于统一的间距、层级与留白 */
 
 :root {
-  --bg: #0b0b0f;
-  --surface: #16161d;
-  --surface-2: #1e1e27;
-  --ink: #f4f4f2;
-  --ink-2: #a2a2ad;
-  --ink-3: #62626e;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-2: rgba(255, 255, 255, 0.14);
-  --lime: #cdff3e;
-  --lime-ink: #0b0b0f;
-  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC',
-    'HarmonyOS Sans SC', 'Noto Sans SC', 'Segoe UI', sans-serif;
+  --bg: #f2efe9;
+  --card: #fdfbf7;
+  --ink: #37322c;
+  --ink-2: #7b746a;
+  --ink-3: #aca498;
+  --clay: #bd7350;
+  --clay-ink: #ffffff;
+  --line: #e8e2d6;
+  --line-soft: #efeae0;
+  --shadow: 0 1px 2px rgba(55, 50, 44, 0.04), 0 8px 24px rgba(55, 50, 44, 0.06);
+  --shadow-sm: 0 1px 2px rgba(55, 50, 44, 0.05);
+  --r: 18px;
+  --sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'HarmonyOS Sans SC',
+    'Noto Sans SC', 'Segoe UI', sans-serif;
 }
 
 * {
@@ -51,14 +53,14 @@ textarea {
 
 .app {
   height: 100%;
-  max-width: 560px;
+  max-width: 540px;
   margin: 0 auto;
   position: relative;
-  background: var(--bg);
 }
 
 .bg-canvas,
-.sun {
+.sun,
+.glow {
   display: none;
 }
 
@@ -72,96 +74,44 @@ textarea {
 
 .page {
   position: relative;
-  padding: 26px 22px calc(130px + env(safe-area-inset-bottom));
+  padding: 24px 22px calc(126px + env(safe-area-inset-bottom));
   min-height: 100%;
-  overflow: hidden;
 }
 
-/* 顶部电光辉光 */
-.glow {
-  position: absolute;
-  top: -180px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 460px;
-  height: 360px;
-  background: radial-gradient(circle, rgba(205, 255, 62, 0.22) 0%, rgba(205, 255, 62, 0) 68%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.page > *:not(.glow) {
-  position: relative;
-  z-index: 1;
-}
-
-/* ————— 顶栏 ————— */
+/* ————— 统一头部 ————— */
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .topbar-label {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   color: var(--ink);
-  padding: 6px 14px;
-  border: 1px solid var(--line-2);
-  border-radius: 999px;
 }
 
 .topbar-meta {
-  font-size: 12px;
-  letter-spacing: 0.04em;
+  font-size: 12.5px;
   color: var(--ink-3);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
-/* ————— 超大标题 ————— */
-.hero {
+.page-title {
   margin: 0;
-  font-size: 48px;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.32;
 }
 
-.hero-sub {
-  margin: 12px 0 26px;
-  font-size: 15px;
+.page-desc {
+  margin: 8px 0 24px;
+  font-size: 14.5px;
   color: var(--ink-2);
-}
-
-/* 时光页大数字统计 */
-.hero-stat {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.stat-num {
-  font-size: 96px;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 0.82;
-  color: var(--lime);
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-unit {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--ink-2);
-  line-height: 1.4;
-}
-
-.stat-unit b {
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
 }
 
 .empty-hint {
@@ -172,8 +122,8 @@ textarea {
 .footnote {
   text-align: center;
   color: var(--ink-3);
-  font-size: 12px;
-  margin: 14px 0 0;
+  font-size: 12.5px;
+  margin: 16px 0 0;
 }
 
 /* ————— 页脚 Dock ————— */
@@ -181,16 +131,16 @@ textarea {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(20px + env(safe-area-inset-bottom));
+  bottom: calc(18px + env(safe-area-inset-bottom));
   display: flex;
   gap: 2px;
   padding: 6px;
   border-radius: 999px;
-  background: rgba(22, 22, 29, 0.82);
-  border: 1px solid var(--line-2);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  background: rgba(253, 251, 247, 0.9);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 2px 8px rgba(55, 50, 44, 0.06), 0 14px 36px rgba(55, 50, 44, 0.14);
   z-index: 30;
 }
 
@@ -205,7 +155,7 @@ textarea {
   border-radius: 999px;
   font-size: 13.5px;
   white-space: nowrap;
-  transition: all 0.3s cubic-bezier(0.3, 1.2, 0.5, 1);
+  transition: all 0.28s cubic-bezier(0.3, 1.1, 0.5, 1);
 }
 
 .tab-icon {
@@ -219,128 +169,31 @@ textarea {
 
 .tab-label {
   display: none;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
 }
 
 .tab.active {
-  background: var(--lime);
-  color: var(--lime-ink);
-  padding: 11px 20px;
-  box-shadow: 0 6px 18px rgba(205, 255, 62, 0.35);
+  background: var(--clay);
+  color: var(--clay-ink);
+  padding: 11px 19px;
+  box-shadow: 0 4px 12px rgba(189, 115, 80, 0.32);
 }
 
 .tab.active .tab-label {
   display: inline;
 }
 
-/* ————— 记录页 ————— */
-.shot-zone {
-  width: 100%;
+/* ————— 记录页：撰写卡 ————— */
+.compose {
+  background: var(--card);
   border: 1px solid var(--line);
-  background: var(--surface);
-  border-radius: 24px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  text-align: left;
-  transition: transform 0.15s ease, border-color 0.2s;
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
-.shot-zone:active {
-  transform: scale(0.99);
-  border-color: var(--line-2);
-}
-
-.shot-ring {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--lime);
-  color: var(--lime-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 6px 20px rgba(205, 255, 62, 0.35);
-}
-
-.shot-ring svg {
-  width: 27px;
-  height: 27px;
-}
-
-.shot-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-}
-
-.shot-title {
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.shot-sub {
-  font-size: 12.5px;
-  color: var(--ink-3);
-}
-
-.shot-arrow {
-  font-size: 20px;
-  color: var(--ink-3);
-}
-
-.album-link {
-  display: block;
-  margin: 12px auto 0;
-  border: none;
-  background: none;
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 4px 10px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--ink-3);
-}
-
-.shot-preview {
-  position: relative;
-}
-
-.shot-preview img {
-  width: 100%;
-  border-radius: 24px;
-  display: block;
-}
-
-.photo-remove {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  background: rgba(11, 11, 15, 0.7);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  font-size: 13px;
-  border: 1px solid var(--line-2);
-}
-
-.write-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  padding: 16px 18px;
-  margin-top: 14px;
-}
-
-.capture-text {
+.compose-text {
   width: 100%;
   border: none;
   background: none;
@@ -348,20 +201,76 @@ textarea {
   line-height: 1.8;
   color: var(--ink);
   outline: none;
-  resize: vertical;
+  resize: none;
+  padding: 18px 18px 6px;
+  display: block;
 }
 
-.capture-text::placeholder,
+.compose-text::placeholder,
 .echo-input::placeholder,
 .chat-input::placeholder {
   color: var(--ink-3);
+}
+
+.compose-tools {
+  display: flex;
+  gap: 8px;
+  padding: 6px 14px 14px;
+}
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: var(--line-soft);
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: background 0.15s;
+}
+
+.tool svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tool:active {
+  background: var(--line);
+}
+
+.compose-photo {
+  position: relative;
+  margin: 4px 14px 14px;
+}
+
+.compose-photo img {
+  width: 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+.photo-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  background: rgba(55, 50, 44, 0.55);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 12px;
 }
 
 .cat-row {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin: 16px 0 26px;
+  margin: 16px 0 24px;
 }
 
 .cat-chip {
@@ -369,147 +278,117 @@ textarea {
   align-items: center;
   gap: 7px;
   border: 1px solid var(--line);
-  background: var(--surface);
+  background: var(--card);
   border-radius: 999px;
   padding: 8px 14px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink-2);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.18s ease;
 }
 
 .cat-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .cat-chip.active {
-  font-weight: 700;
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .save-btn {
   width: 100%;
   border: none;
   border-radius: 999px;
-  background: var(--lime);
-  color: var(--lime-ink);
-  font-size: 16px;
-  font-weight: 800;
-  padding: 17px 0;
-  letter-spacing: 0.14em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 12px 30px rgba(205, 255, 62, 0.3);
+  background: var(--clay);
+  color: var(--clay-ink);
+  font-size: 15.5px;
+  font-weight: 600;
+  padding: 16px 0;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em;
+  box-shadow: 0 8px 22px rgba(189, 115, 80, 0.28);
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .save-btn:active {
-  transform: scale(0.98);
-  opacity: 0.92;
-}
-
-.save-arrow {
-  font-size: 18px;
-  font-weight: 700;
+  transform: scale(0.985);
+  opacity: 0.94;
 }
 
 .save-btn.small {
-  padding: 12px 0;
+  padding: 11px 0;
   font-size: 14px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   box-shadow: none;
 }
 
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(104px + env(safe-area-inset-bottom));
+  bottom: calc(100px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
-  background: var(--lime);
-  color: var(--lime-ink);
-  padding: 12px 22px;
+  background: var(--ink);
+  color: #fdfbf7;
+  padding: 11px 22px;
   border-radius: 999px;
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 500;
   white-space: nowrap;
   z-index: 40;
-  box-shadow: 0 10px 30px rgba(205, 255, 62, 0.3);
+  box-shadow: 0 10px 28px rgba(55, 50, 44, 0.22);
 }
 
-/* ————— 时光页：现代内容流 ————— */
+/* ————— 时光页：内容流 ————— */
 .day-block {
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 
 .day-head {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 9px;
+  margin: 0 2px 12px;
 }
 
 .day-key {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .day-sub {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--ink-3);
-  letter-spacing: 0.04em;
 }
 
 .card {
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 22px;
-  overflow: hidden;
+  border-radius: var(--r);
+  padding: 16px 18px 12px;
   margin-bottom: 12px;
-}
-
-/* 有照片的记录：大图卡 */
-.card-media {
-  position: relative;
-}
-
-.card-media img {
-  width: 100%;
-  display: block;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
-.media-tag {
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  color: #0b0b0f;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 5px 12px;
-}
-
-.card-body {
-  padding: 15px 17px 11px;
+  box-shadow: var(--shadow);
 }
 
 .card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 9px;
+  margin-bottom: 10px;
 }
 
-.chip {
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 4px 11px;
+.cat-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .card-time {
@@ -518,17 +397,21 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
-.photo-time {
+.card-photo {
+  margin: 0 0 12px;
+}
+
+.card-photo img {
+  width: 100%;
+  border-radius: 12px;
   display: block;
-  margin-top: 8px;
 }
 
 .card-line {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.7;
   white-space: pre-wrap;
 }
 
@@ -542,21 +425,29 @@ textarea {
 
 /* ————— 追记 ————— */
 .echoes {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .echo {
-  border-left: 2px solid;
-  padding: 1px 0 1px 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.echo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 7px;
+  flex-shrink: 0;
 }
 
 .echo-meta {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: var(--ink-3);
   margin-bottom: 2px;
 }
@@ -570,36 +461,36 @@ textarea {
 }
 
 .echo-composer {
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .echo-input {
   width: 100%;
-  border: 1px solid var(--line-2);
-  background: var(--surface-2);
-  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  border-radius: 12px;
   font-size: 14px;
   line-height: 1.7;
   padding: 11px 13px;
   color: var(--ink);
   outline: none;
-  resize: vertical;
+  resize: none;
 }
 
 .echo-ops {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-top: 10px;
 }
 
 .echo-save {
   border: none;
   border-radius: 999px;
-  background: var(--lime);
-  color: var(--lime-ink);
+  background: var(--clay);
+  color: var(--clay-ink);
   font-size: 13px;
-  font-weight: 700;
-  padding: 9px 18px;
+  font-weight: 600;
+  padding: 8px 20px;
 }
 
 .echo-cancel {
@@ -607,7 +498,7 @@ textarea {
   background: none;
   color: var(--ink-3);
   font-size: 13px;
-  padding: 9px 4px;
+  padding: 8px 6px;
 }
 
 .entry-actions {
@@ -615,16 +506,17 @@ textarea {
   justify-content: space-between;
   align-items: center;
   margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
 }
 
 .echo-btn {
-  border: 1px solid var(--line-2);
+  border: none;
   background: none;
-  border-radius: 999px;
-  color: var(--ink);
-  font-size: 12.5px;
-  font-weight: 700;
-  padding: 6px 14px;
+  color: var(--clay);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 2px;
 }
 
 .del-group {
@@ -637,12 +529,12 @@ textarea {
   background: none;
   color: var(--ink-3);
   font-size: 12.5px;
-  padding: 6px 2px;
+  padding: 4px 2px;
 }
 
 .entry-del.confirm {
-  color: #ff5c5c;
-  font-weight: 700;
+  color: #c0492f;
+  font-weight: 600;
 }
 
 /* ————— 絮语页 ————— */
@@ -652,14 +544,14 @@ textarea {
   justify-content: space-between;
   gap: 10px;
   padding-bottom: 14px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   border-bottom: 1px solid var(--line);
 }
 
 .chat-title {
   text-align: center;
-  font-size: 17px !important;
-  font-weight: 700;
+  font-size: 16px !important;
+  font-weight: 600;
   margin: 0 !important;
   align-self: center;
   cursor: pointer;
@@ -667,8 +559,8 @@ textarea {
 }
 
 .icon-btn {
-  border: 1px solid var(--line-2);
-  background: var(--surface);
+  border: 1px solid var(--line);
+  background: var(--card);
   border-radius: 50%;
   width: 38px;
   height: 38px;
@@ -677,31 +569,33 @@ textarea {
   justify-content: center;
   font-size: 15px;
   color: var(--ink-2);
+  box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 }
 
 .new-chat-btn {
   width: 100%;
   border: none;
-  background: var(--lime);
-  color: var(--lime-ink);
-  border-radius: 20px;
-  padding: 16px 0;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  margin: 22px 0 18px;
-  box-shadow: 0 12px 30px rgba(205, 255, 62, 0.25);
+  background: var(--clay);
+  color: var(--clay-ink);
+  border-radius: var(--r);
+  padding: 15px 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 22px rgba(189, 115, 80, 0.24);
 }
 
 .chat-item {
   display: flex;
   align-items: center;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: var(--r);
   margin-bottom: 10px;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .chat-item-main {
@@ -718,7 +612,7 @@ textarea {
 
 .chat-item-name {
   font-size: 15.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink);
   letter-spacing: -0.01em;
 }
@@ -738,8 +632,9 @@ textarea {
 }
 
 .chat-item-ops .icon-btn {
-  border: 1px solid var(--line);
-  background: var(--surface-2);
+  border: none;
+  box-shadow: none;
+  background: var(--line-soft);
   width: 33px;
   height: 33px;
   font-size: 13px;
@@ -749,7 +644,7 @@ textarea {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  padding-bottom: calc(98px + env(safe-area-inset-bottom));
 }
 
 .messages {
@@ -765,15 +660,14 @@ textarea {
   color: var(--ink-3);
   text-align: center;
   margin-top: 56px;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 15.5px;
   line-height: 1.9;
 }
 
 .bubble {
   max-width: 82%;
   padding: 11px 16px;
-  border-radius: 20px;
+  border-radius: 18px;
   font-size: 15px;
   line-height: 1.7;
   white-space: pre-wrap;
@@ -794,17 +688,17 @@ textarea {
 
 .bubble.user {
   align-self: flex-end;
-  background: var(--lime);
-  color: var(--lime-ink);
-  font-weight: 600;
+  background: var(--clay);
+  color: var(--clay-ink);
   border-bottom-right-radius: 6px;
 }
 
 .bubble.assistant {
   align-self: flex-start;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
   color: var(--ink);
+  box-shadow: var(--shadow-sm);
   border-bottom-left-radius: 6px;
 }
 
@@ -816,38 +710,39 @@ textarea {
 
 .chat-input {
   flex: 1;
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--line);
   border-radius: 22px;
-  background: var(--surface);
+  background: var(--card);
   font-size: 15px;
   padding: 12px 17px;
   outline: none;
   resize: none;
   max-height: 120px;
   color: var(--ink);
+  box-shadow: var(--shadow-sm);
 }
 
 .send-btn {
   border: none;
   border-radius: 999px;
-  background: var(--lime);
-  color: var(--lime-ink);
+  background: var(--clay);
+  color: var(--clay-ink);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   padding: 12px 20px;
   flex-shrink: 0;
 }
 
 .send-btn:disabled {
-  opacity: 0.28;
+  opacity: 0.3;
 }
 
 /* ————— 弹窗 ————— */
 .modal-mask {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(55, 50, 44, 0.38);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -856,19 +751,20 @@ textarea {
 }
 
 .modal {
-  background: var(--surface);
-  border: 1px solid var(--line-2);
-  border-radius: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
   padding: 24px;
   width: 100%;
   max-width: 380px;
+  box-shadow: 0 24px 60px rgba(55, 50, 44, 0.22);
 }
 
 .modal h2 {
   margin: 0 0 8px;
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .modal-tip {
@@ -880,10 +776,10 @@ textarea {
 
 .modal .line-input {
   width: 100%;
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--line);
   font-size: 15px;
-  background: var(--surface-2);
-  border-radius: 14px;
+  background: var(--bg);
+  border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 16px;
   outline: none;
