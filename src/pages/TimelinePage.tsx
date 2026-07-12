@@ -8,10 +8,7 @@ interface Props {
   onEcho: (id: string, text: string) => void
 }
 
-function fmtDate(ts: number) {
-  const d = new Date(ts)
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
-}
+const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
 function fmtShort(ts: number) {
   const d = new Date(ts)
@@ -23,14 +20,6 @@ function fmtTime(ts: number) {
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
 
-// 记录越多，藤长得越高
-function stage(n: number) {
-  if (n >= 30) return '🌳'
-  if (n >= 10) return '🌿'
-  if (n >= 3) return '🌱'
-  return '✨'
-}
-
 export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [echoFor, setEchoFor] = useState<string | null>(null)
@@ -39,13 +28,13 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
   const sorted = [...entries].sort((a, b) => b.createdAt - a.createdAt)
   const first = entries.length ? Math.min(...entries.map((e) => e.createdAt)) : null
 
-  // 按日期分组
-  const groups: { date: string; items: Entry[] }[] = []
+  // 按日期分组，每组是一期「日刊」
+  const groups: { key: string; ts: number; items: Entry[] }[] = []
   for (const e of sorted) {
-    const date = fmtShort(e.createdAt)
+    const key = fmtShort(e.createdAt)
     const g = groups[groups.length - 1]
-    if (g && g.date === date) g.items.push(e)
-    else groups.push({ date, items: [e] })
+    if (g && g.key === key) g.items.push(e)
+    else groups.push({ key, ts: e.createdAt, items: [e] })
   }
 
   function saveEcho(id: string) {
@@ -58,54 +47,56 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
 
   return (
     <div className="page timeline">
-      <header className="page-head">
-        <div className="eyebrow">时光 {stage(entries.length)}</div>
-        {first ? (
-          <>
-            <h1 className="stat">
-              <em className="count">{entries.length}</em>
-              <span className="unit">段时光</span>
-            </h1>
-            <p className="lede">自 {fmtDate(first)}起，一直在生长。</p>
-          </>
-        ) : (
-          <>
-            <h1>
-              还空着，
-              <br />
-              去挂上第一段时光吧
-            </h1>
-            <p className="lede empty-hint">回到「记录」，从今天开始。</p>
-          </>
-        )}
+      {/* 刊头 */}
+      <header className="masthead">
+        <span className="masthead-mark">拾绪 · 时光</span>
+        <span className="masthead-date">
+          {first ? `自${fmtShort(first)}起 · 共 ${entries.length} 段` : '创刊号 · 待写入'}
+        </span>
       </header>
 
-      <div className="vine">
-        {groups.map((g) => (
-          <section key={g.date} className="day-group">
-            <div className="day-sign">{g.date}</div>
-            {g.items.map((e) => {
-              const c = categoryOf(e.category)
-              const echoes = e.echoes ?? []
-              return (
-                <article key={e.id} className="entry">
-                  <span className="fruit" style={{ background: c.color }} />
-                  <div className="tag-card">
-                    <div className="entry-top">
-                      <span className="entry-tag" style={{ color: c.color }}>
-                        {c.emoji} {c.label}
-                      </span>
-                      <span className="entry-time">{fmtTime(e.createdAt)}</span>
-                    </div>
-                    {e.photo && <img className="entry-photo" src={e.photo} alt="" loading="lazy" />}
-                    <p className="entry-line">{e.line}</p>
-                    {e.text && <p className="entry-text">{e.text}</p>}
+      {!first && (
+        <div className="blank-issue">
+          <h1 className="prompt">
+            第一期，
+            <br />
+            等你来写。
+          </h1>
+          <p className="empty-hint">回到「记录」，写下第一段时光。</p>
+        </div>
+      )}
 
-                    {/* 追记：在原记录上的二次感悟 */}
+      {groups.map((g) => {
+        const d = new Date(g.ts)
+        return (
+          <section key={g.key} className="issue">
+            {/* 头版日期 */}
+            <div className="issue-date">
+              <span className="issue-num">{d.getDate()}</span>
+              <span className="issue-side">
+                {d.getMonth() + 1}月 · 星期{WEEKDAYS[d.getDay()]}
+              </span>
+              <span className="issue-count">{g.items.length} 则</span>
+            </div>
+
+            <div className="issue-body">
+              {g.items.map((e) => {
+                const c = categoryOf(e.category)
+                const echoes = e.echoes ?? []
+                return (
+                  <article key={e.id} className="piece">
+                    {e.photo && <img className="piece-photo" src={e.photo} alt="" loading="lazy" />}
+                    <div className="piece-head">
+                      <span className="piece-cat">{c.label}</span>
+                      <span className="piece-time">{fmtTime(e.createdAt)}</span>
+                    </div>
+                    <p className="piece-line">{e.line}</p>
+                    {e.text && <p className="piece-text">{e.text}</p>}
+
                     {echoes.length > 0 && (
                       <div className="echoes">
                         {echoes.map((ec, i) => (
-                          <div key={i} className="echo" style={{ borderColor: `${c.color}55` }}>
+                          <div key={i} className="echo">
                             <div className="echo-meta">追记 · {fmtShort(ec.ts)} {fmtTime(ec.ts)}</div>
                             <p className="echo-text">{ec.text}</p>
                           </div>
@@ -148,7 +139,7 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                             setEchoDraft('')
                           }}
                         >
-                          ✎ 追记一笔
+                          ✎ 追记
                         </button>
                         {confirmId === e.id ? (
                           <span className="del-group">
@@ -172,13 +163,13 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                         )}
                       </div>
                     )}
-                  </div>
-                </article>
-              )
-            })}
+                  </article>
+                )
+              })}
+            </div>
           </section>
-        ))}
-      </div>
+        )
+      })}
     </div>
   )
 }

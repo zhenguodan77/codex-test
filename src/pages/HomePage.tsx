@@ -9,14 +9,6 @@ interface Props {
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
-function greeting(h: number) {
-  if (h < 5) return '夜深了'
-  if (h < 11) return '早上好'
-  if (h < 14) return '中午好'
-  if (h < 18) return '下午好'
-  return '晚上好'
-}
-
 export default function HomePage({ onSave }: Props) {
   const [category, setCategory] = useState<Category>('daily')
   const [content, setContent] = useState('')
@@ -59,15 +51,25 @@ export default function HomePage({ onSave }: Props) {
 
   return (
     <div className="page capture">
-      <header className="page-head">
-        <div className="eyebrow">
+      {/* 刊头 */}
+      <header className="masthead">
+        <span className="masthead-mark">拾绪</span>
+        <span className="masthead-date">
           {today.getMonth() + 1}月{today.getDate()}日 · 星期{WEEKDAYS[today.getDay()]}
-        </div>
-        <h1>{greeting(today.getHours())}</h1>
-        <p className="lede">好的、坏的，都值得留下。</p>
+        </span>
       </header>
 
-      {/* 视觉锤：日出渐变拍照区 */}
+      <h1 className="prompt">此刻。</h1>
+
+      <textarea
+        className="capture-text"
+        value={content}
+        rows={6}
+        maxLength={500}
+        placeholder="写下正在发生的、想留住的——一顿好饭、一件趣事、一点感悟…"
+        onChange={(e) => setContent(e.target.value)}
+      />
+
       {photo ? (
         <div className="shot-preview">
           <img src={photo} alt="此刻" />
@@ -76,41 +78,26 @@ export default function HomePage({ onSave }: Props) {
           </button>
         </div>
       ) : (
-        <button className="hero-shot" onClick={() => cameraRef.current?.click()}>
-          <span className="hero-icon">
-            <CameraIcon />
-          </span>
-          <span className="hero-title">拍下此刻</span>
-          <span className="hero-sub">轻触打开相机</span>
-        </button>
-      )}
-      {!photo && (
-        <button className="album-link" onClick={() => uploadRef.current?.click()}>
-          从相册选择
-        </button>
+        <div className="photo-row">
+          <button className="photo-btn" onClick={() => cameraRef.current?.click()}>
+            ◉ 拍摄当下
+          </button>
+          <button className="photo-btn" onClick={() => uploadRef.current?.click()}>
+            ▤ 从相册选
+          </button>
+        </div>
       )}
 
-      <div className="write-card">
-        <textarea
-          className="capture-text"
-          value={content}
-          rows={4}
-          maxLength={500}
-          placeholder="配上一段经历、感悟，或随便什么想法…"
-          onChange={(e) => setContent(e.target.value)}
-        />
-        <div className="cat-row">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.key}
-              className={`cat-chip ${category === c.key ? 'active' : ''}`}
-              onClick={() => setCategory(c.key)}
-            >
-              <span className="cat-dot" style={{ background: c.color }} />
-              {c.label}
-            </button>
-          ))}
-        </div>
+      <div className="cat-row">
+        {CATEGORIES.map((c) => (
+          <button
+            key={c.key}
+            className={`cat-chip ${category === c.key ? 'active' : ''}`}
+            onClick={() => setCategory(c.key)}
+          >
+            {c.label}
+          </button>
+        ))}
       </div>
 
       <input
@@ -138,18 +125,9 @@ export default function HomePage({ onSave }: Props) {
       <button className="save-btn" onClick={publish}>
         完 成
       </button>
-      <p className="footnote">发布后自动挂上「时光」</p>
+      <p className="footnote">发布后收录进「时光」的今日刊</p>
 
       {toast && <div className="toast">{toast}</div>}
     </div>
-  )
-}
-
-function CameraIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 4h-5L7.5 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3.5Z" />
-      <circle cx="12" cy="13" r="3.5" />
-    </svg>
   )
 }
