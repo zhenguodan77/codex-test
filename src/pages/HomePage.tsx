@@ -4,7 +4,7 @@ import { compressImage, uid } from '../storage'
 
 interface Props {
   count: number
-  onSave: (entry: Entry) => void
+  onSave: (entry: Entry) => boolean
 }
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
@@ -35,12 +35,16 @@ export default function HomePage({ count, onSave }: Props) {
       showToast('写一句，或添一张照片')
       return
     }
-    onSave({
+    const ok = onSave({
       id: uid(),
       createdAt: Date.now(),
       line: content.trim() || '此刻，无需多言',
       photo,
     })
+    if (!ok) {
+      showToast('存储空间已满，删掉些旧照片再试')
+      return
+    }
     setContent('')
     setPhoto(undefined)
   }

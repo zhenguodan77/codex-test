@@ -31,16 +31,27 @@ export function loadEntries(): Entry[] {
   })
 }
 
-export function saveEntries(entries: Entry[]) {
-  localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries))
+/** 写入成功返回 true；空间不足等失败返回 false（不抛出，避免中断渲染） */
+export function saveEntries(entries: Entry[]): boolean {
+  try {
+    localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries))
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function loadChats(): ChatSession[] {
   return load<ChatSession[]>(CHATS_KEY, [])
 }
 
-export function saveChats(chats: ChatSession[]) {
-  localStorage.setItem(CHATS_KEY, JSON.stringify(chats))
+export function saveChats(chats: ChatSession[]): boolean {
+  try {
+    localStorage.setItem(CHATS_KEY, JSON.stringify(chats))
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function loadApiKey(): string {

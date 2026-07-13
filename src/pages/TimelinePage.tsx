@@ -23,6 +23,7 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [echoFor, setEchoFor] = useState<string | null>(null)
   const [echoDraft, setEchoDraft] = useState('')
+  const [viewPhoto, setViewPhoto] = useState<string | null>(null)
 
   const sorted = [...entries].sort((a, b) => b.createdAt - a.createdAt)
 
@@ -84,9 +85,9 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                     </div>
 
                     {e.photo && (
-                      <div className="card-photo">
+                      <button className="card-photo" onClick={() => setViewPhoto(e.photo!)} aria-label="查看大图">
                         <img src={e.photo} alt="" loading="lazy" />
-                      </div>
+                      </button>
                     )}
 
                     <p className="card-line">{e.line}</p>
@@ -172,6 +173,12 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
           )
         })}
       </div>
+
+      {viewPhoto && (
+        <div className="lightbox" onClick={() => setViewPhoto(null)}>
+          <img src={viewPhoto} alt="" />
+        </div>
+      )}
     </div>
   )
 }

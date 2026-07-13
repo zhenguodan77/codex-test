@@ -466,13 +466,51 @@ textarea {
 }
 
 .card-photo {
+  display: block;
+  width: 100%;
   margin: 0 0 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
 }
 
 .card-photo img {
   width: 100%;
   border-radius: 12px;
   display: block;
+}
+
+/* 照片大图查看 */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 16, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 60;
+  cursor: zoom-out;
+  animation: fade 0.18s ease;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .card-line {

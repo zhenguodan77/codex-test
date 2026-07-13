@@ -95,7 +95,7 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
       <div className="page chat-list">
         <header className="topbar">
           <span className="topbar-label">絮语</span>
-          <button className="icon-btn" onClick={() => setShowSettings(true)} title="设置">
+          <button className="icon-btn" onClick={() => setShowSettings(true)} title="设置" aria-label="设置">
             ⚙
           </button>
         </header>
@@ -113,10 +113,10 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
               </span>
             </button>
             <div className="chat-item-ops">
-              <button className="icon-btn" onClick={() => renameChat(c.id)} title="重命名">
+              <button className="icon-btn" onClick={() => renameChat(c.id)} title="重命名" aria-label="重命名对话">
                 ✏️
               </button>
-              <button className="icon-btn" onClick={() => deleteChat(c.id)} title="删除">
+              <button className="icon-btn" onClick={() => deleteChat(c.id)} title="删除" aria-label="删除对话">
                 🗑
               </button>
             </div>
@@ -159,13 +159,13 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
   return (
     <div className="page chat-view">
       <header className="chat-head">
-        <button className="icon-btn" onClick={() => setActiveId(null)}>
+        <button className="icon-btn" onClick={() => setActiveId(null)} aria-label="返回">
           ←
         </button>
         <h1 className="chat-title" onClick={() => renameChat(active.id)} title="点击重命名">
           {active.name}
         </h1>
-        <button className="icon-btn" onClick={() => deleteChat(active.id)} title="删除">
+        <button className="icon-btn" onClick={() => deleteChat(active.id)} title="删除" aria-label="删除对话">
           🗑
         </button>
       </header>

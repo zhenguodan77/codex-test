@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ChatSession, Entry } from './types'
-import {
-  loadApiKey,
-  loadChats,
-  loadEntries,
-  saveApiKey,
-  saveChats,
-  saveEntries,
-} from './storage'
+import { loadApiKey, loadChats, loadEntries, saveApiKey, saveChats, saveEntries } from './storage'
 import HomePage from './pages/HomePage'
 import TimelinePage from './pages/TimelinePage'
 import ChatPage from './pages/ChatPage'
@@ -46,35 +39,37 @@ export default function App() {
   const [chats, setChats] = useState<ChatSession[]>(() => loadChats())
   const [apiKey, setApiKey] = useState<string>(() => loadApiKey())
 
-  useEffect(() => saveEntries(entries), [entries])
-  useEffect(() => saveChats(chats), [chats])
+  useEffect(() => {
+    saveChats(chats)
+  }, [chats])
   useEffect(() => saveApiKey(apiKey), [apiKey])
+
+  /** 先落盘再更新内存：写入失败时不改状态，草稿不丢，交由调用方提示 */
+  function commitEntries(next: Entry[]): boolean {
+    if (!saveEntries(next)) return false
+    setEntries(next)
+    return true
+  }
 
   return (
     <div className="app">
-      {/* 毛玻璃底下的彩色光斑壁纸 */}
-      <div className="bg-canvas" aria-hidden>
-        <span className="blob b1" />
-        <span className="blob b2" />
-        <span className="blob b3" />
-        <span className="blob b4" />
-      </div>
       <main className="main">
         {tab === 'home' && (
           <HomePage
             count={entries.length}
             onSave={(e) => {
-              setEntries([e, ...entries])
-              setTab('timeline') // 发布后自动跳到时光页
+              const ok = commitEntries([e, ...entries])
+              if (ok) setTab('timeline') // 发布后自动跳到时光页
+              return ok
             }}
           />
         )}
         {tab === 'timeline' && (
           <TimelinePage
             entries={entries}
-            onDelete={(id) => setEntries(entries.filter((e) => e.id !== id))}
+            onDelete={(id) => commitEntries(entries.filter((e) => e.id !== id))}
             onEcho={(id, text) =>
-              setEntries(
+              commitEntries(
                 entries.map((e) =>
                   e.id === id ? { ...e, echoes: [...(e.echoes ?? []), { ts: Date.now(), text }] } : e,
                 ),
