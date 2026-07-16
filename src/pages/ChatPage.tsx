@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChatSession, Entry } from '../types'
-import { uid } from '../storage'
+import type { Backup } from '../storage'
+import { buildBackup, downloadText, parseBackup, uid } from '../storage'
 import { streamReply } from '../ai'
 
 interface Props {
@@ -9,16 +10,47 @@ interface Props {
   entries: Entry[]
   apiKey: string
   setApiKey: (k: string) => void
+  onImport: (data: Backup) => boolean
 }
 
-export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }: Props) {
+export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey, onImport }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState('')
   const [busy, setBusy] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [keyDraft, setKeyDraft] = useState(apiKey)
+  const [note, setNote] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+  const importRef = useRef<HTMLInputElement>(null)
+
+  function flash(msg: string) {
+    setNote(msg)
+    setTimeout(() => setNote(''), 2600)
+  }
+
+  function exportData() {
+    const d = new Date()
+    const stamp = `${d.getFullYear()}${(d.getMonth() + 1).toString().padStart(2, '0')}${d
+      .getDate()
+      .toString()
+      .padStart(2, '0')}`
+    downloadText(`拾绪备份-${stamp}.json`, JSON.stringify(buildBackup(entries, chats), null, 2))
+    flash('已导出备份文件')
+  }
+
+  async function importFile(file: File | undefined) {
+    if (!file) return
+    const text = await file.text()
+    const data = parseBackup(text)
+    if (!data) {
+      flash('文件无法识别，请选择拾绪导出的备份')
+      return
+    }
+    if (!window.confirm(`导入将覆盖当前全部数据（${data.entries.length} 条记录）。确定继续？`)) return
+    const ok = onImport(data)
+    flash(ok ? '已恢复备份' : '空间不足，导入失败')
+  }
 
   const active = chats.find((c) => c.id === activeId) ?? null
 
@@ -142,15 +174,41 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey }
                   className="save-btn small"
                   onClick={() => {
                     setApiKey(keyDraft.trim())
-                    setShowSettings(false)
+                    flash('已保存')
                   }}
                 >
-                  保存
+                  保存 Key
                 </button>
               </div>
+
+              <div className="modal-divider" />
+              <h3 className="modal-sub">数据备份</h3>
+              <p className="modal-tip">
+                记录都存在本机浏览器里。换设备或清缓存前，导出一份备份；需要时再导入恢复。
+              </p>
+              <div className="backup-ops">
+                <button className="backup-btn" onClick={exportData}>
+                  导出备份
+                </button>
+                <button className="backup-btn" onClick={() => importRef.current?.click()}>
+                  导入恢复
+                </button>
+              </div>
+              <input
+                ref={importRef}
+                type="file"
+                accept="application/json,.json"
+                hidden
+                onChange={(e) => {
+                  importFile(e.target.files?.[0])
+                  e.target.value = ''
+                }}
+              />
             </div>
           </div>
         )}
+
+        {note && <div className="toast">{note}</div>}
       </div>
     )
   }

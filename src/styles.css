@@ -896,3 +896,43 @@ textarea {
 .modal-ops {
   margin-top: 0;
 }
+
+.modal-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 20px 0 16px;
+}
+
+.modal-sub {
+  margin: 0 0 6px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.backup-ops {
+  display: flex;
+  gap: 10px;
+}
+
+.backup-btn {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background 0.15s;
+}
+
+.backup-btn:active {
+  background: var(--line-soft);
+}
+
+/* 时光页操作区左侧：编辑 / 追记 */
+.act-left {
+  display: flex;
+  gap: 16px;
+}

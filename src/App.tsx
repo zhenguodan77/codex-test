@@ -68,6 +68,9 @@ export default function App() {
           <TimelinePage
             entries={entries}
             onDelete={(id) => commitEntries(entries.filter((e) => e.id !== id))}
+            onEdit={(id, line) =>
+              commitEntries(entries.map((e) => (e.id === id ? { ...e, line } : e)))
+            }
             onEcho={(id, text) =>
               commitEntries(
                 entries.map((e) =>
@@ -78,7 +81,18 @@ export default function App() {
           />
         )}
         {tab === 'chat' && (
-          <ChatPage chats={chats} setChats={setChats} entries={entries} apiKey={apiKey} setApiKey={setApiKey} />
+          <ChatPage
+            chats={chats}
+            setChats={setChats}
+            entries={entries}
+            apiKey={apiKey}
+            setApiKey={setApiKey}
+            onImport={(data) => {
+              const ok = commitEntries(data.entries)
+              if (ok) setChats(data.chats)
+              return ok
+            }}
+          />
         )}
       </main>
 

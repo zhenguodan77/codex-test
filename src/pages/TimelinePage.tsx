@@ -4,6 +4,7 @@ import type { Entry } from '../types'
 interface Props {
   entries: Entry[]
   onDelete: (id: string) => void
+  onEdit: (id: string, line: string) => void
   onEcho: (id: string, text: string) => void
 }
 
@@ -19,11 +20,20 @@ function fmtTime(ts: number) {
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
 
-export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
+export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Props) {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [echoFor, setEchoFor] = useState<string | null>(null)
   const [echoDraft, setEchoDraft] = useState('')
+  const [editFor, setEditFor] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState('')
   const [viewPhoto, setViewPhoto] = useState<string | null>(null)
+
+  function saveEdit(id: string) {
+    const t = editDraft.trim()
+    if (t) onEdit(id, t)
+    setEditFor(null)
+    setEditDraft('')
+  }
 
   const sorted = [...entries].sort((a, b) => b.createdAt - a.createdAt)
 
@@ -107,7 +117,33 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                       </div>
                     )}
 
-                    {echoFor === e.id ? (
+                    {editFor === e.id ? (
+                      <div className="echo-composer">
+                        <textarea
+                          className="echo-input"
+                          value={editDraft}
+                          rows={2}
+                          maxLength={60}
+                          placeholder="改写这句记录…"
+                          onChange={(ev) => setEditDraft(ev.target.value)}
+                          autoFocus
+                        />
+                        <div className="echo-ops">
+                          <button className="echo-save" onClick={() => saveEdit(e.id)}>
+                            保存
+                          </button>
+                          <button
+                            className="echo-cancel"
+                            onClick={() => {
+                              setEditFor(null)
+                              setEditDraft('')
+                            }}
+                          >
+                            取消
+                          </button>
+                        </div>
+                      </div>
+                    ) : echoFor === e.id ? (
                       <div className="echo-composer">
                         <textarea
                           className="echo-input"
@@ -135,15 +171,26 @@ export default function TimelinePage({ entries, onDelete, onEcho }: Props) {
                       </div>
                     ) : (
                       <div className="entry-actions">
-                        <button
-                          className="echo-btn"
-                          onClick={() => {
-                            setEchoFor(e.id)
-                            setEchoDraft('')
-                          }}
-                        >
-                          ＋ 追记
-                        </button>
+                        <div className="act-left">
+                          <button
+                            className="echo-btn"
+                            onClick={() => {
+                              setEditFor(e.id)
+                              setEditDraft(e.line)
+                            }}
+                          >
+                            ✎ 编辑
+                          </button>
+                          <button
+                            className="echo-btn"
+                            onClick={() => {
+                              setEchoFor(e.id)
+                              setEchoDraft('')
+                            }}
+                          >
+                            ＋ 追记
+                          </button>
+                        </div>
                         {confirmId === e.id ? (
                           <span className="del-group">
                             <button

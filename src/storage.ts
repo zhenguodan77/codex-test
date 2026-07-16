@@ -67,6 +67,53 @@ export function uid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
 }
 
+// ————— 备份：导出 / 导入 —————
+export interface Backup {
+  app: 'shixu'
+  version: number
+  exportedAt: number
+  entries: Entry[]
+  chats: ChatSession[]
+}
+
+export function buildBackup(entries: Entry[], chats: ChatSession[]): Backup {
+  return { app: 'shixu', version: 1, exportedAt: Date.now(), entries, chats }
+}
+
+/** 解析并校验导入文件；结构不对返回 null */
+export function parseBackup(text: string): Backup | null {
+  try {
+    const data = JSON.parse(text)
+    if (data?.app !== 'shixu' || !Array.isArray(data.entries)) return null
+    const entries: Entry[] = data.entries.filter(
+      (e: unknown): e is Entry =>
+        !!e && typeof (e as Entry).id === 'string' && typeof (e as Entry).createdAt === 'number',
+    )
+    const chats: ChatSession[] = Array.isArray(data.chats)
+      ? data.chats.filter(
+          (c: unknown): c is ChatSession =>
+            !!c && typeof (c as ChatSession).id === 'string' && Array.isArray((c as ChatSession).messages),
+        )
+      : []
+    return { app: 'shixu', version: 1, exportedAt: data.exportedAt ?? Date.now(), entries, chats }
+  } catch {
+    return null
+  }
+}
+
+/** 触发浏览器下载一段文本 */
+export function downloadText(filename: string, text: string) {
+  const blob = new Blob([text], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
 /** 把图片压缩成最长边 1280px 的 JPEG base64，控制 localStorage 占用 */
 export function compressImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
