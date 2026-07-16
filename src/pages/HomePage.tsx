@@ -71,7 +71,9 @@ export default function HomePage({ count, onSave }: Props) {
             if (e.key === 'Enter') publish()
           }}
         />
-        {count > 0 && <div className="hero-count">至今已留下 {count} 个瞬间</div>}
+        <div className="hero-count">
+          {count > 0 ? `至今已留下 ${count} 个瞬间` : '从这里，记下第一件小事'}
+        </div>
       </div>
 
       {/* 底部：拍摄 / 相册 + 完成 */}
