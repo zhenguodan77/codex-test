@@ -4,12 +4,13 @@ import { compressImage, uid } from '../storage'
 
 interface Props {
   count: number
+  streak: number
   onSave: (entry: Entry) => boolean
 }
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
-export default function HomePage({ count, onSave }: Props) {
+export default function HomePage({ count, streak, onSave }: Props) {
   const [content, setContent] = useState('')
   const [photo, setPhoto] = useState<string | undefined>()
   const [toast, setToast] = useState('')
@@ -72,7 +73,11 @@ export default function HomePage({ count, onSave }: Props) {
           }}
         />
         <div className="hero-count">
-          {count > 0 ? `至今已留下 ${count} 个瞬间` : '从这里，记下第一件小事'}
+          {count === 0
+            ? '从这里，记下第一件小事'
+            : streak >= 2
+              ? `已连续记录 ${streak} 天 · 共 ${count} 个瞬间`
+              : `至今已留下 ${count} 个瞬间`}
         </div>
       </div>
 

@@ -12,11 +12,49 @@
   --clay-ink: #ffffff;
   --line: #e8e2d6;
   --line-soft: #efeae0;
+  --dock: rgba(253, 251, 247, 0.9);
+  --toast-text: #fdfbf7;
   --shadow: 0 1px 2px rgba(55, 50, 44, 0.04), 0 8px 24px rgba(55, 50, 44, 0.06);
   --shadow-sm: 0 1px 2px rgba(55, 50, 44, 0.05);
   --r: 18px;
   --sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'HarmonyOS Sans SC',
     'Noto Sans SC', 'Segoe UI', sans-serif;
+}
+
+/* 深色主题（手动选择） */
+:root[data-theme='dark'] {
+  --bg: #1c1917;
+  --card: #262220;
+  --ink: #ece6dd;
+  --ink-2: #a89e91;
+  --ink-3: #6e675e;
+  --clay: #cf8b7f;
+  --clay-ink: #2a1e1b;
+  --line: #39332d;
+  --line-soft: #2e2a26;
+  --dock: rgba(38, 34, 32, 0.88);
+  --toast-text: #1c1917;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 深色主题（跟随系统） */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #1c1917;
+    --card: #262220;
+    --ink: #ece6dd;
+    --ink-2: #a89e91;
+    --ink-3: #6e675e;
+    --clay: #cf8b7f;
+    --clay-ink: #2a1e1b;
+    --line: #39332d;
+    --line-soft: #2e2a26;
+    --dock: rgba(38, 34, 32, 0.88);
+    --toast-text: #1c1917;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
 }
 
 * {
@@ -136,7 +174,7 @@ textarea {
   gap: 2px;
   padding: 6px;
   border-radius: 999px;
-  background: rgba(253, 251, 247, 0.9);
+  background: var(--dock);
   border: 1px solid var(--line);
   backdrop-filter: blur(18px) saturate(1.3);
   -webkit-backdrop-filter: blur(18px) saturate(1.3);
@@ -401,7 +439,7 @@ textarea {
   bottom: calc(100px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   background: var(--ink);
-  color: #fdfbf7;
+  color: var(--toast-text);
   padding: 11px 22px;
   border-radius: 999px;
   font-size: 13.5px;
@@ -411,8 +449,16 @@ textarea {
   box-shadow: 0 10px 28px rgba(55, 50, 44, 0.22);
 }
 
-/* ————— 时光页：搜索 ————— */
+/* ————— 时光页：搜索 + 导出 ————— */
+.list-tools {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 16px;
+}
+
 .search {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -420,8 +466,31 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 10px 14px;
-  margin-bottom: 16px;
   box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.export-btn {
+  width: 46px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 14px;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.export-btn:disabled {
+  opacity: 0.4;
+}
+
+.export-btn svg {
+  width: 19px;
+  height: 19px;
 }
 
 .search-icon {
@@ -959,6 +1028,8 @@ textarea {
   padding: 24px;
   width: 100%;
   max-width: 380px;
+  max-height: 84vh;
+  overflow-y: auto;
   box-shadow: 0 24px 60px rgba(55, 50, 44, 0.22);
 }
 
@@ -1030,4 +1101,85 @@ textarea {
 .act-left {
   display: flex;
   gap: 16px;
+}
+
+/* ————— 设置：分段选择（主题） ————— */
+.seg {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.seg-item {
+  flex: 1;
+  border: none;
+  background: none;
+  border-radius: 9px;
+  padding: 9px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  transition: all 0.15s;
+}
+
+.seg-item.active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ————— 设置：每日提醒 ————— */
+.reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: var(--line);
+  padding: 0;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.switch .knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  transition: left 0.2s;
+}
+
+.switch.on {
+  background: var(--clay);
+}
+
+.switch.on .knob {
+  left: 23px;
+}
+
+.time-input {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.time-input:disabled {
+  opacity: 0.4;
 }

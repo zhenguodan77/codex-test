@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import type { Entry } from '../types'
+import { downloadBlob } from '../storage'
+import { exportTimelineImage } from '../exportImage'
 
 interface Props {
   entries: Entry[]
@@ -28,6 +30,13 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
   const [editDraft, setEditDraft] = useState('')
   const [viewPhoto, setViewPhoto] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const [note, setNote] = useState('')
+  const [exporting, setExporting] = useState(false)
+
+  function flash(msg: string) {
+    setNote(msg)
+    setTimeout(() => setNote(''), 2600)
+  }
 
   function saveEdit(id: string) {
     const t = editDraft.trim()
@@ -65,6 +74,30 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
     else groups.push({ key, ts: e.createdAt, items: [e] })
   }
 
+  async function doExport() {
+    if (exporting) return
+    if (!matched.length) {
+      flash('没有可导出的记录')
+      return
+    }
+    setExporting(true)
+    flash('正在生成长图…')
+    try {
+      const { blob, truncated } = await exportTimelineImage(matched)
+      const d = new Date()
+      const stamp = `${d.getFullYear()}${(d.getMonth() + 1).toString().padStart(2, '0')}${d
+        .getDate()
+        .toString()
+        .padStart(2, '0')}`
+      downloadBlob(`拾绪时光-${stamp}.png`, blob)
+      flash(truncated ? '已导出长图（最近 40 条）' : '已导出长图 ✓')
+    } catch {
+      flash('导出失败，再试一次')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   // 插入月份分隔
   type Row = { kind: 'month'; label: string } | { kind: 'day'; group: (typeof groups)[number] }
   const rows: Row[] = []
@@ -99,19 +132,24 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
           <h1 className="page-title">此刻之前</h1>
           <p className="page-desc">你留下的每一个瞬间，都在这里。</p>
 
-          <div className="search">
-            <SearchIcon />
-            <input
-              className="search-input"
-              value={query}
-              placeholder="搜索记录…"
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            {query && (
-              <button className="search-clear" onClick={() => setQuery('')} aria-label="清除搜索">
-                ✕
-              </button>
-            )}
+          <div className="list-tools">
+            <div className="search">
+              <SearchIcon />
+              <input
+                className="search-input"
+                value={query}
+                placeholder="搜索记录…"
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {query && (
+                <button className="search-clear" onClick={() => setQuery('')} aria-label="清除搜索">
+                  ✕
+                </button>
+              )}
+            </div>
+            <button className="export-btn" onClick={doExport} disabled={exporting} aria-label="导出长图" title="导出长图">
+              <DownloadIcon />
+            </button>
           </div>
 
           {q && (
@@ -278,7 +316,19 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
           <img src={viewPhoto} alt="" />
         </div>
       )}
+
+      {note && <div className="toast">{note}</div>}
     </div>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 4v11" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M4 19.5h16" />
+    </svg>
   )
 }
 

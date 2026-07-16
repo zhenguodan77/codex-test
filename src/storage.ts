@@ -67,6 +67,43 @@ export function uid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
 }
 
+// ————— 偏好设置（主题 / 每日提醒） —————
+export type ThemePref = 'system' | 'light' | 'dark'
+
+export interface Prefs {
+  theme: ThemePref
+  reminderEnabled: boolean
+  reminderTime: string // "HH:MM"
+}
+
+const PREFS_KEY = 'shixu.prefs'
+const NOTIFIED_KEY = 'shixu.lastNotified'
+
+export function loadPrefs(): Prefs {
+  return { theme: 'system', reminderEnabled: false, reminderTime: '21:00', ...load<Partial<Prefs>>(PREFS_KEY, {}) }
+}
+
+export function savePrefs(p: Prefs) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(p))
+  } catch {
+    /* 空间不足时忽略 */
+  }
+}
+
+/** 记录「今天已提醒过」，避免重复打扰 */
+export function loadLastNotified(): string {
+  return localStorage.getItem(NOTIFIED_KEY) ?? ''
+}
+
+export function saveLastNotified(day: string) {
+  try {
+    localStorage.setItem(NOTIFIED_KEY, day)
+  } catch {
+    /* ignore */
+  }
+}
+
 // ————— 备份：导出 / 导入 —————
 export interface Backup {
   app: 'shixu'
@@ -101,9 +138,8 @@ export function parseBackup(text: string): Backup | null {
   }
 }
 
-/** 触发浏览器下载一段文本 */
-export function downloadText(filename: string, text: string) {
-  const blob = new Blob([text], { type: 'application/json' })
+/** 触发浏览器下载一个 Blob */
+export function downloadBlob(filename: string, blob: Blob) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -112,6 +148,11 @@ export function downloadText(filename: string, text: string) {
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+/** 触发浏览器下载一段文本 */
+export function downloadText(filename: string, text: string) {
+  downloadBlob(filename, new Blob([text], { type: 'application/json' }))
 }
 
 /** 把图片压缩成最长边 1280px 的 JPEG base64，控制 localStorage 占用 */

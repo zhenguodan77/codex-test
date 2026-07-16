@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react'
 import type { ChatSession, Entry } from './types'
-import { loadApiKey, loadChats, loadEntries, saveApiKey, saveChats, saveEntries } from './storage'
+import type { Prefs } from './storage'
+import {
+  loadApiKey,
+  loadChats,
+  loadEntries,
+  loadLastNotified,
+  loadPrefs,
+  saveApiKey,
+  saveChats,
+  saveEntries,
+  saveLastNotified,
+  savePrefs,
+} from './storage'
+import { computeStreak, dayKey, MILESTONES } from './utils'
 import HomePage from './pages/HomePage'
 import TimelinePage from './pages/TimelinePage'
 import ChatPage from './pages/ChatPage'
@@ -33,16 +46,79 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'chat', label: '絮语' },
 ]
 
+const REMIND_BODY = '今天还没记录哦，来写一句吧'
+
 export default function App() {
   const [tab, setTab] = useState<Tab>('home')
   const [entries, setEntries] = useState<Entry[]>(() => loadEntries())
   const [chats, setChats] = useState<ChatSession[]>(() => loadChats())
   const [apiKey, setApiKey] = useState<string>(() => loadApiKey())
+  const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs())
+  const [notice, setNotice] = useState('')
 
   useEffect(() => {
     saveChats(chats)
   }, [chats])
   useEffect(() => saveApiKey(apiKey), [apiKey])
+  useEffect(() => savePrefs(prefs), [prefs])
+
+  function flash(msg: string, ms = 3000) {
+    setNotice(msg)
+    setTimeout(() => setNotice(''), ms)
+  }
+
+  // ————— 主题（跟随系统 / 浅色 / 深色） —————
+  useEffect(() => {
+    const root = document.documentElement
+    if (prefs.theme === 'system') delete root.dataset.theme
+    else root.dataset.theme = prefs.theme
+
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const applyMeta = () => {
+      const dark = prefs.theme === 'dark' || (prefs.theme === 'system' && mq.matches)
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#1c1917' : '#f4f1ea')
+    }
+    applyMeta()
+    mq.addEventListener('change', applyMeta)
+    return () => mq.removeEventListener('change', applyMeta)
+  }, [prefs.theme])
+
+  // ————— 每日提醒 —————
+  useEffect(() => {
+    if (!prefs.reminderEnabled) return
+
+    const tick = () => {
+      const now = new Date()
+      const hhmm = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
+      const today = dayKey(Date.now())
+      if (hhmm < prefs.reminderTime) return
+      if (loadLastNotified() === today) return
+      if (entries.some((e) => dayKey(e.createdAt) === today)) return
+
+      saveLastNotified(today)
+      if (document.visibilityState === 'visible') {
+        flash(`${REMIND_BODY} ✎`, 3600)
+      } else if ('Notification' in window && Notification.permission === 'granted') {
+        navigator.serviceWorker
+          ?.getRegistration()
+          .then((reg) => {
+            if (reg) reg.showNotification('拾绪', { body: REMIND_BODY, icon: './icon.svg' })
+            else new Notification('拾绪', { body: REMIND_BODY })
+          })
+          .catch(() => {
+            try {
+              new Notification('拾绪', { body: REMIND_BODY })
+            } catch {
+              /* ignore */
+            }
+          })
+      }
+    }
+
+    tick()
+    const id = setInterval(tick, 30_000)
+    return () => clearInterval(id)
+  }, [prefs.reminderEnabled, prefs.reminderTime, entries])
 
   /** 先落盘再更新内存：写入失败时不改状态，草稿不丢，交由调用方提示 */
   function commitEntries(next: Entry[]): boolean {
@@ -51,15 +127,27 @@ export default function App() {
     return true
   }
 
+  const streak = computeStreak(entries)
+
   return (
     <div className="app">
       <main className="main">
         {tab === 'home' && (
           <HomePage
             count={entries.length}
+            streak={streak}
             onSave={(e) => {
-              const ok = commitEntries([e, ...entries])
-              if (ok) setTab('timeline') // 发布后自动跳到时光页
+              const firstToday = !entries.some((x) => dayKey(x.createdAt) === dayKey(e.createdAt))
+              const next = [e, ...entries]
+              const ok = commitEntries(next)
+              if (ok) {
+                setTab('timeline') // 发布后自动跳到时光页
+                if (firstToday) {
+                  const s = computeStreak(next)
+                  if (MILESTONES.includes(s)) flash(`连续记录 ${s} 天了，为你高兴 ✦`)
+                  else if (s >= 2) flash(`已连续记录 ${s} 天 ✦`)
+                }
+              }
               return ok
             }}
           />
@@ -87,6 +175,8 @@ export default function App() {
             entries={entries}
             apiKey={apiKey}
             setApiKey={setApiKey}
+            prefs={prefs}
+            setPrefs={setPrefs}
             onImport={(data) => {
               const ok = commitEntries(data.entries)
               if (ok) setChats(data.chats)
@@ -109,6 +199,8 @@ export default function App() {
           </button>
         ))}
       </nav>
+
+      {notice && <div className="toast">{notice}</div>}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChatSession, Entry } from '../types'
-import type { Backup } from '../storage'
+import type { Backup, Prefs, ThemePref } from '../storage'
 import { buildBackup, downloadText, parseBackup, uid } from '../storage'
 import { streamReply } from '../ai'
 
@@ -10,10 +10,18 @@ interface Props {
   entries: Entry[]
   apiKey: string
   setApiKey: (k: string) => void
+  prefs: Prefs
+  setPrefs: (p: Prefs) => void
   onImport: (data: Backup) => boolean
 }
 
-export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey, onImport }: Props) {
+const THEME_OPTIONS: { key: ThemePref; label: string }[] = [
+  { key: 'system', label: '跟随系统' },
+  { key: 'light', label: '浅色' },
+  { key: 'dark', label: '深色' },
+]
+
+export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey, prefs, setPrefs, onImport }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState('')
@@ -37,6 +45,14 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey, 
       .padStart(2, '0')}`
     downloadText(`拾绪备份-${stamp}.json`, JSON.stringify(buildBackup(entries, chats), null, 2))
     flash('已导出备份文件')
+  }
+
+  function toggleReminder() {
+    const next = !prefs.reminderEnabled
+    if (next && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {})
+    }
+    setPrefs({ ...prefs, reminderEnabled: next })
   }
 
   async function importFile(file: File | undefined) {
@@ -179,6 +195,45 @@ export default function ChatPage({ chats, setChats, entries, apiKey, setApiKey, 
                 >
                   保存 Key
                 </button>
+              </div>
+
+              <div className="modal-divider" />
+              <h3 className="modal-sub">外观</h3>
+              <div className="seg">
+                {THEME_OPTIONS.map((t) => (
+                  <button
+                    key={t.key}
+                    className={`seg-item ${prefs.theme === t.key ? 'active' : ''}`}
+                    onClick={() => setPrefs({ ...prefs, theme: t.key })}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="modal-divider" />
+              <h3 className="modal-sub">每日提醒</h3>
+              <p className="modal-tip">
+                到点如果今天还没记录，会提醒你写一句。App 打开时生效；后台需要授权通知权限。
+              </p>
+              <div className="reminder-row">
+                <button
+                  className={`switch ${prefs.reminderEnabled ? 'on' : ''}`}
+                  onClick={toggleReminder}
+                  aria-label="每日提醒开关"
+                  role="switch"
+                  aria-checked={prefs.reminderEnabled}
+                >
+                  <span className="knob" />
+                </button>
+                <input
+                  type="time"
+                  className="time-input"
+                  value={prefs.reminderTime}
+                  disabled={!prefs.reminderEnabled}
+                  onChange={(e) => setPrefs({ ...prefs, reminderTime: e.target.value || '21:00' })}
+                  aria-label="提醒时间"
+                />
               </div>
 
               <div className="modal-divider" />

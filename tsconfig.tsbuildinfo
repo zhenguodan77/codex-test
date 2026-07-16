@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/ai.ts","./src/main.tsx","./src/storage.ts","./src/types.ts","./src/pages/ChatPage.tsx","./src/pages/HomePage.tsx","./src/pages/TimelinePage.tsx"],"version":"5.9.3"}
+{"root":["./src/App.tsx","./src/ai.ts","./src/exportImage.ts","./src/main.tsx","./src/storage.ts","./src/types.ts","./src/utils.ts","./src/pages/ChatPage.tsx","./src/pages/HomePage.tsx","./src/pages/TimelinePage.tsx"],"version":"5.9.3"}
