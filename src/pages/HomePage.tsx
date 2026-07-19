@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { Entry } from '../types'
 import { compressImage, uid } from '../storage'
+import { quoteOfDay } from '../quotes'
 
 interface Props {
   count: number
@@ -14,6 +15,7 @@ export default function HomePage({ count, streak, onSave }: Props) {
   const [content, setContent] = useState('')
   const [photo, setPhoto] = useState<string | undefined>()
   const [toast, setToast] = useState('')
+  const [qOffset, setQOffset] = useState(0)
   const uploadRef = useRef<HTMLInputElement>(null)
   const cameraRef = useRef<HTMLInputElement>(null)
 
@@ -61,7 +63,10 @@ export default function HomePage({ count, streak, onSave }: Props) {
           拾绪 · {today.getMonth() + 1}月{today.getDate()}日 星期{WEEKDAYS[today.getDay()]}
         </div>
         <h1 className="big-title">记录</h1>
-        <p className="big-desc">写下此刻，一句话就好</p>
+        <button className="quote" onClick={() => setQOffset((o) => o + 1)} title="换一句">
+          <span className="quote-text">{quoteOfDay(qOffset).text}</span>
+          <span className="quote-source">—— {quoteOfDay(qOffset).source}</span>
+        </button>
         <input
           className="hero-input"
           value={content}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Entry } from '../types'
 import { downloadBlob } from '../storage'
 import { exportTimelineImage } from '../exportImage'
+import StarLightbox from '../StarLightbox'
 
 interface Props {
   entries: Entry[]
@@ -28,7 +29,7 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
   const [echoDraft, setEchoDraft] = useState('')
   const [editFor, setEditFor] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState('')
-  const [viewPhoto, setViewPhoto] = useState<string | null>(null)
+  const [viewPhoto, setViewPhoto] = useState<{ photo: string; line: string } | null>(null)
   const [query, setQuery] = useState('')
   const [note, setNote] = useState('')
   const [exporting, setExporting] = useState(false)
@@ -183,7 +184,11 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
                         </div>
 
                         {e.photo && (
-                          <button className="card-photo" onClick={() => setViewPhoto(e.photo!)} aria-label="查看大图">
+                          <button
+                            className="card-photo"
+                            onClick={() => setViewPhoto({ photo: e.photo!, line: e.line })}
+                            aria-label="查看大图"
+                          >
                             <img src={e.photo} alt="" loading="lazy" />
                           </button>
                         )}
@@ -312,9 +317,7 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
       )}
 
       {viewPhoto && (
-        <div className="lightbox" onClick={() => setViewPhoto(null)}>
-          <img src={viewPhoto} alt="" />
-        </div>
+        <StarLightbox photo={viewPhoto.photo} line={viewPhoto.line} onClose={() => setViewPhoto(null)} />
       )}
 
       {note && <div className="toast">{note}</div>}
