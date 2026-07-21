@@ -113,6 +113,9 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
     rows.push({ kind: 'day', group: g })
   }
 
+  // 入场动画的错落延迟：只在前几条上递增，避免长列表整体延迟过久
+  let cardIndex = 0
+
   return (
     <div className="page timeline">
       <header className="topbar">
@@ -174,8 +177,13 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
 
                   {row.group.items.map((e) => {
                     const echoes = e.echoes ?? []
+                    const delay = Math.min(cardIndex++, 7) * 55
                     return (
-                      <article key={e.id} className="card">
+                      <article
+                        key={e.id}
+                        className="card"
+                        style={{ ['--d' as string]: `${delay}ms` }}
+                      >
                         <div className="card-head">
                           <span className="card-time">
                             <span className="time-dot" />
