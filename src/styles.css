@@ -157,6 +157,13 @@ textarea {
   font-size: 14px;
 }
 
+.page-loading {
+  padding: 80px 24px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
 .footnote {
   text-align: center;
   color: var(--ink-3);

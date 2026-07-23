@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { ChatSession, Entry } from './types'
 import type { Prefs } from './storage'
 import {
@@ -16,7 +16,8 @@ import {
 import { computeStreak, dayKey, MILESTONES } from './utils'
 import HomePage from './pages/HomePage'
 import TimelinePage from './pages/TimelinePage'
-import ChatPage from './pages/ChatPage'
+// 絮语页会引入体积较大的 Anthropic SDK，按需懒加载，避免拖慢记录/时光的首屏
+const ChatPage = lazy(() => import('./pages/ChatPage'))
 
 type Tab = 'home' | 'timeline' | 'chat'
 
@@ -169,20 +170,22 @@ export default function App() {
           />
         )}
         {tab === 'chat' && (
-          <ChatPage
-            chats={chats}
-            setChats={setChats}
-            entries={entries}
-            apiKey={apiKey}
-            setApiKey={setApiKey}
-            prefs={prefs}
-            setPrefs={setPrefs}
-            onImport={(data) => {
-              const ok = commitEntries(data.entries)
-              if (ok) setChats(data.chats)
-              return ok
-            }}
-          />
+          <Suspense fallback={<div className="page-loading">载入中…</div>}>
+            <ChatPage
+              chats={chats}
+              setChats={setChats}
+              entries={entries}
+              apiKey={apiKey}
+              setApiKey={setApiKey}
+              prefs={prefs}
+              setPrefs={setPrefs}
+              onImport={(data) => {
+                const ok = commitEntries(data.entries)
+                if (ok) setChats(data.chats)
+                return ok
+              }}
+            />
+          </Suspense>
         )}
       </main>
 

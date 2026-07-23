@@ -15,6 +15,14 @@ export default function StarLightbox({ photo, line, onClose }: Props) {
   const imgElRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  useEffect(() => {
     let raf = 0
     let cancelled = false
     const canvas = canvasRef.current
@@ -45,6 +53,13 @@ export default function StarLightbox({ photo, line, onClose }: Props) {
       if (stage) {
         stage.style.width = `${dw}px`
         stage.style.height = `${dh}px`
+      }
+
+      // 减弱动态效果：直接呈现静图，不做粒子/持续微光
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        canvas.style.display = 'none'
+        imgElRef.current?.classList.add('show')
+        return
       }
 
       // 采样像素 → 光点
@@ -98,8 +113,7 @@ export default function StarLightbox({ photo, line, onClose }: Props) {
         }
       }
 
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      const ASSEMBLE = reduced ? 0 : 2.1 // 秒
+      const ASSEMBLE = 2.1 // 秒
       const start = performance.now()
       const ease = (t: number) => 1 - Math.pow(1 - t, 3)
       let settled = false
@@ -110,7 +124,7 @@ export default function StarLightbox({ photo, line, onClose }: Props) {
         ctx.clearRect(0, 0, dw, dh)
         let allDone = true
         for (const p of parts) {
-          const t = ASSEMBLE === 0 ? 1 : Math.min(1, Math.max(0, (sec - p.delay) / ASSEMBLE))
+          const t = Math.min(1, Math.max(0, (sec - p.delay) / ASSEMBLE))
           if (t < 1) allDone = false
           const e = ease(t)
           const x = p.sx + (p.tx - p.sx) * e
