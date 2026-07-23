@@ -31,6 +31,21 @@ npm run dev
 
 所有记录、对话、设置都保存在浏览器 localStorage（键前缀 `shixu.`），完全本地、离线可用。照片会压缩到最长边 1280px 再保存以控制体积。localStorage 容量约 5MB；写入前会先落盘再更新界面，空间不足时会提示「存储空间已满」而不会丢失正在写的草稿。照片较多时，后续版本可迁移到 IndexedDB。
 
+## 在 Xcode 里跑到 iOS 模拟器 / 真机
+
+本项目已配好 [Capacitor](https://capacitorjs.com/)，可包成原生 iOS 壳在 Xcode 里运行。**需在 macOS 上操作**（Xcode + CocoaPods）：
+
+```bash
+npm install
+npm run ios:add     # 首次：生成 ios/ 原生工程并 pod install
+npm run ios:sync    # 构建 web 产物并同步到原生工程（每次改完代码都跑）
+npm run ios:open    # 打开 Xcode，选模拟器或真机点运行
+```
+
+想边改边看（热更新）：`npm run dev` 记下终端的 Network 地址，把 `capacitor.config.ts` 里的 `server.url` 取消注释并填上，再 `npm run ios:sync && npm run ios:open`。
+
+> 真机运行需在 Xcode 里给 App 选一个开发者签名 Team（个人 Apple ID 即可）。
+
 ## 技术栈
 
-React 18 + Vite 5 + TypeScript，无后端。附带 PWA manifest 与图标，可安装到主屏幕。
+React 18 + Vite 5 + TypeScript，无后端。附带 PWA manifest 与图标，可安装到主屏幕；并集成 Capacitor 以打包为原生 iOS App。
