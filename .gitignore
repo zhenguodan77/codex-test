@@ -1,0 +1,11 @@
+node_modules
+dist
+*.local
+.DS_Store
+
+# Capacitor / iOS（在 Mac 上 npm run ios:add 后生成）
+ios/App/Pods
+ios/App/App/public
+ios/App/build
+DerivedData
+*.xcuserstate

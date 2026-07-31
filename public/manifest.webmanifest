@@ -1,0 +1,17 @@
+{
+  "name": "拾绪 · 记录",
+  "short_name": "拾绪",
+  "description": "把好的、坏的、领悟到的日常，都记下来。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
