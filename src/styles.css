@@ -84,6 +84,13 @@ button {
   color: inherit;
 }
 
+/* 键盘可访问性：仅键盘聚焦时显示描边，不影响触摸/鼠标 */
+:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 input,
 textarea {
   font-family: inherit;
@@ -853,6 +860,12 @@ textarea {
 .echo {
   display: flex;
   gap: 10px;
+  align-items: flex-start;
+}
+
+.echo-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .echo-dot {
@@ -862,6 +875,16 @@ textarea {
   margin-top: 7px;
   flex-shrink: 0;
   background: var(--clay);
+}
+
+.echo-del {
+  border: none;
+  background: none;
+  color: var(--ink-3);
+  font-size: 12px;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .echo-meta {

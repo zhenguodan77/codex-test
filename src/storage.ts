@@ -31,10 +31,20 @@ export function loadEntries(): Entry[] {
   })
 }
 
+// 照片迁移到 IndexedDB 完成前，localStorage 仍保留内联照片（兼容旧数据）；
+// 完成后只写文字索引，照片交给 IndexedDB。
+let stripPhotos = false
+export function enablePhotoStripping() {
+  stripPhotos = true
+}
+
 /** 写入成功返回 true；空间不足等失败返回 false（不抛出，避免中断渲染） */
 export function saveEntries(entries: Entry[]): boolean {
   try {
-    localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries))
+    const toStore = stripPhotos
+      ? entries.map((e) => (e.photo ? { ...e, photo: undefined } : e))
+      : entries
+    localStorage.setItem(ENTRIES_KEY, JSON.stringify(toStore))
     return true
   } catch {
     return false

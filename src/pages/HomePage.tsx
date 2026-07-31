@@ -45,7 +45,7 @@ export default function HomePage({ count, streak, onSave }: Props) {
       photo,
     })
     if (!ok) {
-      showToast('存储空间已满，删掉些旧照片再试')
+      showToast('保存失败，存储空间不足')
       return
     }
     setContent('')

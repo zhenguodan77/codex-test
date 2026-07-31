@@ -62,8 +62,8 @@ export default function StarLightbox({ photo, line, onClose }: Props) {
         return
       }
 
-      // 采样像素 → 光点
-      const cols = Math.max(48, Math.min(92, Math.round(dw / 6)))
+      // 采样像素 → 光点（上限压低，兼顾低端机性能）
+      const cols = Math.max(44, Math.min(74, Math.round(dw / 7)))
       const rows = Math.max(1, Math.round((cols * dh) / dw))
       const off = document.createElement('canvas')
       off.width = cols

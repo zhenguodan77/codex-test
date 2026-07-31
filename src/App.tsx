@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import type { ChatSession, Entry } from './types'
 import type { Prefs } from './storage'
 import {
+  enablePhotoStripping,
   loadApiKey,
   loadChats,
   loadEntries,
@@ -13,6 +14,7 @@ import {
   saveLastNotified,
   savePrefs,
 } from './storage'
+import { deletePhoto, loadAllPhotos, putPhoto, replaceAllPhotos } from './photos'
 import { computeStreak, dayKey, MILESTONES } from './utils'
 import HomePage from './pages/HomePage'
 import TimelinePage from './pages/TimelinePage'
@@ -62,6 +64,32 @@ export default function App() {
   }, [chats])
   useEffect(() => saveApiKey(apiKey), [apiKey])
   useEffect(() => savePrefs(prefs), [prefs])
+
+  // ————— 照片迁移 / 水合（IndexedDB） —————
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      const map = await loadAllPhotos()
+      // 旧数据：localStorage 里内联的照片迁移进 IndexedDB
+      for (const e of loadEntries()) {
+        if (e.photo && !map[e.id]) {
+          await putPhoto(e.id, e.photo)
+          map[e.id] = e.photo
+        }
+      }
+      if (!alive) return
+      enablePhotoStripping()
+      // 把 IndexedDB 里的照片合回内存记录，并将 localStorage 重写为纯文字索引
+      setEntries((prev) => {
+        const next = prev.map((e) => (e.photo ? e : map[e.id] ? { ...e, photo: map[e.id] } : e))
+        saveEntries(next)
+        return next
+      })
+    })()
+    return () => {
+      alive = false
+    }
+  }, [])
 
   function flash(msg: string, ms = 3000) {
     setNotice(msg)
@@ -140,6 +168,7 @@ export default function App() {
             onSave={(e) => {
               const firstToday = !entries.some((x) => dayKey(x.createdAt) === dayKey(e.createdAt))
               const next = [e, ...entries]
+              if (e.photo) putPhoto(e.id, e.photo)
               const ok = commitEntries(next)
               if (ok) {
                 setTab('timeline') // 发布后自动跳到时光页
@@ -156,7 +185,10 @@ export default function App() {
         {tab === 'timeline' && (
           <TimelinePage
             entries={entries}
-            onDelete={(id) => commitEntries(entries.filter((e) => e.id !== id))}
+            onDelete={(id) => {
+              deletePhoto(id)
+              commitEntries(entries.filter((e) => e.id !== id))
+            }}
             onEdit={(id, line) =>
               commitEntries(entries.map((e) => (e.id === id ? { ...e, line } : e)))
             }
@@ -164,6 +196,13 @@ export default function App() {
               commitEntries(
                 entries.map((e) =>
                   e.id === id ? { ...e, echoes: [...(e.echoes ?? []), { ts: Date.now(), text }] } : e,
+                ),
+              )
+            }
+            onEchoDelete={(id, idx) =>
+              commitEntries(
+                entries.map((e) =>
+                  e.id === id ? { ...e, echoes: (e.echoes ?? []).filter((_, i) => i !== idx) } : e,
                 ),
               )
             }
@@ -180,6 +219,9 @@ export default function App() {
               prefs={prefs}
               setPrefs={setPrefs}
               onImport={(data) => {
+                const photoMap: Record<string, string> = {}
+                for (const e of data.entries) if (e.photo) photoMap[e.id] = e.photo
+                replaceAllPhotos(photoMap)
                 const ok = commitEntries(data.entries)
                 if (ok) setChats(data.chats)
                 return ok

@@ -9,6 +9,7 @@ interface Props {
   onDelete: (id: string) => void
   onEdit: (id: string, line: string) => void
   onEcho: (id: string, text: string) => void
+  onEchoDelete: (id: string, idx: number) => void
 }
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
@@ -23,7 +24,7 @@ function fmtTime(ts: number) {
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
 
-export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Props) {
+export default function TimelinePage({ entries, onDelete, onEdit, onEcho, onEchoDelete }: Props) {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [echoFor, setEchoFor] = useState<string | null>(null)
   const [echoDraft, setEchoDraft] = useState('')
@@ -209,10 +210,19 @@ export default function TimelinePage({ entries, onDelete, onEdit, onEcho }: Prop
                             {echoes.map((ec, i) => (
                               <div key={i} className="echo">
                                 <span className="echo-dot" />
-                                <div>
+                                <div className="echo-body">
                                   <div className="echo-meta">追记 · {fmtShort(ec.ts)} {fmtTime(ec.ts)}</div>
                                   <p className="echo-text">{ec.text}</p>
                                 </div>
+                                <button
+                                  className="echo-del"
+                                  aria-label="删除这条追记"
+                                  onClick={() => {
+                                    if (window.confirm('删除这条追记？')) onEchoDelete(e.id, i)
+                                  }}
+                                >
+                                  ✕
+                                </button>
                               </div>
                             ))}
                           </div>
